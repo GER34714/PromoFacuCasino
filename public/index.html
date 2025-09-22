@@ -6,51 +6,77 @@
 <title>Sorteo Fortuna Play™</title>
 
 <style>
+/* ===== Reset ===== */
 body{
-  font-family: Arial, Helvetica, sans-serif;
-  background:#111;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, rgba(17,17,17,0.95), rgba(0,0,0,0.85)),
+              url('https://iili.io/Ka4uxHX.md.jpg') center/cover no-repeat fixed;
   color:#fff;
   text-align:center;
   margin:0;
   padding:0;
 }
+
+/* ===== Header ===== */
 header img{
-  width:100%;
+  width:90%;
   max-width:600px;
   height:auto;
   display:block;
-  margin:0 auto;
-  border-bottom:3px solid #0f0;
+  margin:20px auto 10px;
+  border-radius:12px;
+  box-shadow:0 0 25px rgba(0,255,0,0.5);
+  backdrop-filter: blur(5px);
 }
+
+/* ===== Título ===== */
 h1{
   margin:20px 10px;
   color:#0f0;
-  text-shadow:0 0 10px #0f0;
+  text-shadow:0 0 15px rgba(0,255,0,0.8),0 0 30px rgba(0,255,0,0.6);
 }
+
+/* ===== Grilla ===== */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(50px,1fr));
-  gap:6px;
+  gap:8px;
   max-width:600px;
   margin:20px auto;
-  padding:0 10px;
+  padding:10px;
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+  box-shadow:0 0 20px rgba(0,255,0,0.1);
+  backdrop-filter: blur(6px);
 }
 .num{
-  background:#222;
-  padding:10px 0;
-  border-radius:6px;
+  background:rgba(255,255,255,0.1);
+  padding:12px 0;
+  border-radius:10px;
   cursor:pointer;
-  transition:.2s;
+  transition:all .25s;
   font-size:1.1rem;
+  font-weight:bold;
+  box-shadow:0 0 10px rgba(0,0,0,0.3);
 }
-.num:hover{background:#0f0;color:#000}
-.selected{background:#0f0;color:#000}
+.num:hover{
+  background:rgba(0,255,0,0.3);
+  color:#000;
+  box-shadow:0 0 12px rgba(0,255,0,0.7);
+}
+.selected{
+  background:rgba(0,255,0,0.6);
+  color:#000;
+  box-shadow:0 0 18px rgba(0,255,0,0.8);
+}
 .bloqueado{
-  background:#555;
-  color:#999;
+  background:rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);
   text-decoration:line-through;
   cursor:not-allowed;
 }
+
+/* ===== Input & Button ===== */
 .input-box{
   margin:20px auto;
   max-width:400px;
@@ -58,29 +84,39 @@ h1{
 }
 .input-box input{
   width:100%;
-  padding:12px;
+  padding:14px;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   font-size:1rem;
   text-align:center;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  box-shadow:0 0 10px rgba(0,255,0,0.2);
+  backdrop-filter: blur(4px);
 }
+.input-box input::placeholder{color:rgba(255,255,255,0.5);}
 .button-box{
   margin:20px auto 40px;
 }
 .button-box button{
-  padding:14px 40px;
+  padding:16px 40px;
   border:none;
-  border-radius:8px;
-  background:#0f0;
+  border-radius:10px;
+  background:linear-gradient(45deg, rgba(0,255,0,0.8), rgba(0,200,200,0.8));
   color:#000;
   font-weight:bold;
   font-size:1.1rem;
   cursor:pointer;
-  transition:background .2s;
+  box-shadow:0 0 20px rgba(0,255,0,0.4);
+  transition:transform .2s, box-shadow .2s;
 }
-.button-box button:hover{background:#7f7}
+.button-box button:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 30px rgba(0,255,0,0.7);
+}
+
 @media (max-width:480px){
-  .num{font-size:.9rem;padding:8px 0;}
+  .num{font-size:.9rem;padding:10px 0;}
   .button-box button{width:90%;}
 }
 </style>
@@ -93,7 +129,6 @@ h1{
 
 <h1>🎉 Elegí tu número 🎉</h1>
 
-<!-- Contenedor de la grilla -->
 <div class="grid" id="grid"></div>
 
 <div class="input-box">
@@ -105,13 +140,12 @@ h1{
 </div>
 
 <script>
-// ==== Variables ====
 const grid = document.getElementById('grid');
 let elegido = null;
 let bloqueados = [];
 let cajeroActual = null;
 
-// 1️⃣ Cargar números bloqueados desde el backend
+// 1️⃣ Cargar números bloqueados
 fetch('/api/bloqueados')
   .then(r => r.json())
   .then(d => {
@@ -120,7 +154,7 @@ fetch('/api/bloqueados')
   })
   .catch(err => console.error('Error cargando bloqueados:', err));
 
-// 2️⃣ Pedir el próximo cajero para este usuario
+// 2️⃣ Pedir el próximo cajero
 fetch('/api/cajero')
   .then(r => r.json())
   .then(d => {
@@ -130,7 +164,7 @@ fetch('/api/cajero')
 
 // ==== Renderizar la grilla ====
 function renderGrid() {
-  grid.innerHTML = ""; // limpiar por si recarga
+  grid.innerHTML = "";
   for (let i = 1; i <= 100; i++) {
     const div = document.createElement('div');
     div.textContent = i;
@@ -156,13 +190,13 @@ function reservar() {
     alert("Elegí un número libre y poné tu WhatsApp");
     return;
   }
-  // Registrar en el backend
+  // Registrar en backend
   fetch('/api/registrar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ numero: elegido, telefono: tel })
   });
-  // Abrir WhatsApp con mensaje
+  // Abrir WhatsApp
   const msg = `Hola! Mi número elegido para el sorteo es ${elegido}`;
   window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`, '_blank');
 }
