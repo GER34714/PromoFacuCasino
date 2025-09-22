@@ -93,6 +93,7 @@ h1{
 
 <h1>🎉 Elegí tu número 🎉</h1>
 
+<!-- Contenedor de la grilla -->
 <div class="grid" id="grid"></div>
 
 <div class="input-box">
@@ -104,39 +105,68 @@ h1{
 </div>
 
 <script>
-const grid=document.getElementById('grid');
-let elegido=null;
-let bloqueados=[];
-let cajeroActual=null;
+// ==== Variables ====
+const grid = document.getElementById('grid');
+let elegido = null;
+let bloqueados = [];
+let cajeroActual = null;
 
-// 1️⃣ Cargar números bloqueados
-fetch('/api/bloqueados').then(r=>r.json()).then(d=>{
-  bloqueados=d.bloqueados;
-  renderGrid();
-});
+// 1️⃣ Cargar números bloqueados desde el backend
+fetch('/api/bloqueados')
+  .then(r => r.json())
+  .then(d => {
+    bloqueados = d.bloqueados;
+    renderGrid();
+  })
+  .catch(err => console.error('Error cargando bloqueados:', err));
 
-// 2️⃣ Pedir el próximo cajero
-fetch('/api/cajero').then(r=>r.json()).then(d=>{
-  cajeroActual = d.cajero;
-});
+// 2️⃣ Pedir el próximo cajero para este usuario
+fetch('/api/cajero')
+  .then(r => r.json())
+  .then(d => {
+    cajeroActual = d.cajero;
+  })
+  .catch(err => console.error('Error obteniendo cajero:', err));
 
-function renderGrid(){
-  for(let i=1;i<=100;i++){
-    const div=document.createElement('div');
-    div.textContent=i;
-    if(bloqueados.includes(i)){
-      div.className='num bloqueado';
-    }else{
-      div.className='num';
-      div.onclick=()=>{if(div.classList.contains('bloqueado'))return;
-        document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
+// ==== Renderizar la grilla ====
+function renderGrid() {
+  grid.innerHTML = ""; // limpiar por si recarga
+  for (let i = 1; i <= 100; i++) {
+    const div = document.createElement('div');
+    div.textContent = i;
+    if (bloqueados.includes(i)) {
+      div.className = 'num bloqueado';
+    } else {
+      div.className = 'num';
+      div.onclick = () => {
+        if (div.classList.contains('bloqueado')) return;
+        document.querySelectorAll('.num').forEach(n => n.classList.remove('selected'));
         div.classList.add('selected');
-        elegido=i;
+        elegido = i;
       };
     }
     grid.appendChild(div);
   }
 }
 
-function reservar(){
-  const tel=docum
+// ==== Acción del botón ====
+function reservar() {
+  const tel = document.getElementById('whatsapp').value.trim();
+  if (!elegido || !tel || !cajeroActual) {
+    alert("Elegí un número libre y poné tu WhatsApp");
+    return;
+  }
+  // Registrar en el backend
+  fetch('/api/registrar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ numero: elegido, telefono: tel })
+  });
+  // Abrir WhatsApp con mensaje
+  const msg = `Hola! Mi número elegido para el sorteo es ${elegido}`;
+  window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+</script>
+
+</body>
+</html>
