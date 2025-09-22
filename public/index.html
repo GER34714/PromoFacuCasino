@@ -4,23 +4,74 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sorteo Fortuna Play™</title>
+
 <style>
-body{font-family:Arial;text-align:center;background:#111;color:#fff}
-.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;max-width:400px;margin:20px auto}
-.num{background:#222;padding:10px;border-radius:6px;cursor:pointer;transition:.2s}
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background:#111;
+  color:#fff;
+  text-align:center;
+  margin:0;
+  padding:20px;
+}
+h1{
+  margin-top:10px;
+  color:#0f0;
+  text-shadow:0 0 10px #0f0;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:5px;
+  max-width:400px;
+  margin:20px auto;
+}
+.num{
+  background:#222;
+  padding:10px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:.2s;
+}
 .num:hover{background:#0f0;color:#000}
 .selected{background:#0f0;color:#000}
-.bloqueado{background:#555;color:#999;text-decoration:line-through;cursor:not-allowed}
-input{padding:8px;margin-top:10px;width:80%;border:none;border-radius:4px}
-button{margin-top:15px;padding:10px 20px;border:none;border-radius:6px;background:#0f0;color:#000;font-weight:bold;cursor:pointer}
+.bloqueado{
+  background:#555;
+  color:#999;
+  text-decoration:line-through;
+  cursor:not-allowed;
+}
+input{
+  padding:8px;
+  margin-top:10px;
+  width:80%;
+  border:none;
+  border-radius:4px;
+  text-align:center;
+}
+button{
+  margin-top:15px;
+  padding:10px 20px;
+  border:none;
+  border-radius:6px;
+  background:#0f0;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{background:#7f7}
 </style>
 </head>
 <body>
-<h1>Elegí tu número</h1>
 
+<h1>🎉 Elegí tu número 🎉</h1>
+
+<!-- Contenedor de la grilla -->
 <div class="grid" id="grid"></div>
 
+<!-- Campo para WhatsApp -->
 <input type="text" id="whatsapp" placeholder="Tu WhatsApp (solo números)">
+<br>
 <button onclick="enviar()">Confirmar selección</button>
 
 <script>
@@ -29,12 +80,13 @@ let elegido=null;
 let bloqueados=[];
 let cajeroActual=null;
 
-// 1. Cargar números bloqueados
+// 1️⃣ Cargar números bloqueados desde el backend
 fetch('/api/bloqueados').then(r=>r.json()).then(d=>{
-  bloqueados=d.bloqueados; renderGrid();
+  bloqueados=d.bloqueados;
+  renderGrid();
 });
 
-// 2. Pedir el próximo cajero para este usuario
+// 2️⃣ Pedir el próximo cajero para este usuario
 fetch('/api/cajero').then(r=>r.json()).then(d=>{
   cajeroActual = d.cajero;
 });
@@ -49,7 +101,8 @@ function renderGrid(){
       div.className='num';
       div.onclick=()=>{if(div.classList.contains('bloqueado'))return;
         document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
-        div.classList.add('selected');elegido=i;
+        div.classList.add('selected');
+        elegido=i;
       };
     }
     grid.appendChild(div);
@@ -58,9 +111,17 @@ function renderGrid(){
 
 function enviar(){
   const tel=document.getElementById('whatsapp').value.trim();
-  if(!elegido || !tel || !cajeroActual){alert("Elegí un número y poné tu WhatsApp");return;}
-  fetch('/api/registrar',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({numero:elegido,telefono:tel})});
+  if(!elegido || !tel || !cajeroActual){
+    alert("Elegí un número y poné tu WhatsApp");
+    return;
+  }
+  // Registrar en backend
+  fetch('/api/registrar',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({numero:elegido,telefono:tel})
+  });
+  // Abrir WhatsApp con mensaje pre-armado
   const msg=`Hola! Mi número elegido para el sorteo es ${elegido}`;
   window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
 }
