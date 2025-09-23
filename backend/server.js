@@ -62,3 +62,10 @@ app.get('/api/ganador', (req, res) => {
 // ===== START =====
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('Servidor corriendo en puerto', PORT));
+// 🔹 Contador y últimos números
+app.get('/api/stats', (req, res) => {
+  const lista = JSON.parse(fs.readFileSync(DATA_FILE));
+  const total = lista.length;
+  const ultimos = lista.slice(-5).reverse().map(item => item.numero);
+  res.json({ total, ultimos });
+});
