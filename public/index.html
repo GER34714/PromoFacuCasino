@@ -135,17 +135,14 @@ let elegido = null;
 let bloqueados = [];
 let cajeroActual = null;
 
-// 🔹 Cargar lista de bloqueados desde el backend
+// 🔹 Cargar lista de bloqueados
 function cargarBloqueados(){
   fetch('/api/bloqueados')
     .then(r => r.json())
-    .then(d => {
-      bloqueados = d.bloqueados;
-      renderGrid();
-    });
+    .then(d => { bloqueados = d.bloqueados; renderGrid(); });
 }
 
-// 🔹 Obtener cajero
+// 🔹 Obtener cajero (siempre Facu en este backend)
 fetch('/api/cajero')
   .then(r => r.json())
   .then(d => { cajeroActual = d.cajero; });
@@ -186,19 +183,24 @@ function reservar() {
   .then(r => r.json())
   .then(res => {
     if (res.ok) {
-      alert(`Número ${elegido} reservado correctamente`);
-      cargarBloqueados(); // 🔄 Actualizar grilla
+      alert(
+        `🎉 Tu número ${elegido} fue reservado!\n\n` +
+        `Tu cajero asignado va a ser Facu ✅\n\n` +
+        `Escribile por WhatsApp para solicitar tu carga y ` +
+        `reservar tu numerito (posible ganador 🤑)\n\n` +
+        `Gracias por participar y mucha suerte 📲🍀`
+      );
+      cargarBloqueados();
+      const msg = `Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
+      window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`, '_blank');
     } else {
       alert("Ese número ya fue ocupado, elegí otro");
       cargarBloqueados();
     }
   });
-
-  const msg = `Hola! Mi número elegido para el sorteo es ${elegido}`;
-  window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// 🔹 Primera carga
+// Primera carga
 cargarBloqueados();
 </script>
 
