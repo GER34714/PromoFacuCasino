@@ -100,12 +100,12 @@ h1{
   position:fixed;
   top:0;
   left:0;
-  width:100vw;             /* ocupa toda la ventana */
+  width:100vw;
   height:100vh;
   background:rgba(0,0,0,0.7);
-  display:none;            /* visible en JS */
+  display:none;
   padding:16px;
-  overflow:auto;           /* scroll vertical si es necesario */
+  overflow:auto;
   z-index:1000;
 }
 
@@ -113,15 +113,15 @@ h1{
   background:#222;
   border:2px solid #0f0;
   border-radius:16px;
-  width:calc(100% - 32px);  /* siempre cabe dentro de la pantalla */
-  max-width:360px;          /* tope en pantallas grandes */
+  width:calc(100% - 32px);
+  max-width:360px;
   max-height:calc(100% - 32px);
   padding:clamp(16px,5vw,25px);
-  margin:40px auto;         /* centra horizontal y agrega espacio arriba/abajo */
+  margin:40px auto;
   box-sizing:border-box;
   text-align:center;
   color:#fff;
-  overflow-y:auto;          /* scroll interno si hay mucho texto */
+  overflow-y:auto;
 }
 .modal-content h2{
   color:#0f0;
@@ -171,8 +171,7 @@ footer a:hover{text-decoration:underline;}
   <img src="https://iili.io/KaQZyss.md.jpg" alt="Fortuna Play Logo">
 </header>
 
-<h1>🎉 Elegí tu número
-para participar🎉</h1>
+<h1>🎉 Elegí tu número para participar 🎉</h1>
 
 <div class="stats">
   Participantes hasta ahora: <span id="contador">0</span> 🎯
@@ -198,9 +197,9 @@ para participar🎉</h1>
   <div class="modal-content" style="text-align:left;">
     <h2>Bases y Condiciones</h2>
     <p>
-      • La participación es gratuita y voluntaria el número es una posibilidad mas de ganar no es una venta de rifa ni un sorteo.<br>
+      • La participación es gratuita y voluntaria. El número es una posibilidad más de ganar; no es una rifa ni un sorteo.<br>
       • Cada persona puede reservar solo un número.<br>
-      • El número ganador será publicado en la página y en los estados de WhatsApp (recorda Agendarnos) se entregara el premio al número ganador una vez entregados todos los números .<br>
+      • El número ganador será publicado en la página y en los estados de WhatsApp (recordá agendarnos).<br>
       • El premio se coordinará únicamente con el número de WhatsApp utilizado para la reserva.<br>
       • La organización se reserva el derecho de validar los datos y de anular reservas fraudulentas.<br>
       • Al participar aceptás estas condiciones.
@@ -288,7 +287,8 @@ function confirmarReserva(){
       audio.play();
       cerrarModal('modalReserva');
       cargarDatos();
-      const msg=`Hola! Mi número elegido para la promoción es el numero: ${elegido}`;
+      // ✅ Mensaje actualizado sin la palabra sorteo
+      const msg=`Mi número elegido para el Premio FortunaPlay es el número ${elegido}`;
       setTimeout(()=>{
         window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
       },1500);
