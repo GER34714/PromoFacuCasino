@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sorteo Fortuna Play™</title>
 
+<!-- 🎉 Librería de confeti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <style>
 body{
   font-family:'Segoe UI',Arial,sans-serif;
-  /* 🖼️ Fondo con imagen y degradé oscuro encima */
+  /* Fondo con imagen + degradé oscuro */
   background:
     linear-gradient(135deg, rgba(17,17,17,0.85), rgba(0,0,0,0.85)),
     url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
@@ -28,10 +31,28 @@ header img{
   backdrop-filter:blur(5px);
 }
 h1{
-  margin:20px 10px;
+  margin:15px 10px;
   color:#0f0;
   text-shadow:0 0 15px rgba(0,255,0,0.8),0 0 30px rgba(0,255,0,0.6);
 }
+.stats{
+  margin:10px auto;
+  max-width:600px;
+  font-size:1.1rem;
+}
+.ticker{
+  overflow:hidden;
+  white-space:nowrap;
+  box-sizing:border-box;
+  animation:ticker 15s linear infinite;
+  color:#0ff;
+  margin-top:8px;
+}
+@keyframes ticker {
+  0%{transform:translateX(100%);}
+  100%{transform:translateX(-100%);}
+}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(50px,1fr));
@@ -52,7 +73,6 @@ h1{
   transition:all .25s;
   font-size:1.1rem;
   font-weight:bold;
-  box-shadow:0 0 10px rgba(0,0,0,0.3);
 }
 .num:hover{
   background:rgba(0,255,0,0.3);
@@ -70,6 +90,7 @@ h1{
   text-decoration:line-through;
   cursor:not-allowed;
 }
+
 .button-box{
   margin:25px auto 40px;
 }
@@ -83,23 +104,23 @@ h1{
   font-weight:bold;
   font-size:1.3rem;
   cursor:pointer;
-  box-shadow:0 0 25px rgba(0,255,255,0.4);
+  box-shadow:0 10px 20px rgba(0,255,255,0.3);
+  transition:transform .2s, box-shadow .2s;
   animation:gradiente 6s ease infinite;
+}
+.button-box button:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 15px 25px rgba(0,255,255,0.6);
 }
 @keyframes gradiente{
   0%{background-position:0% 50%;}
   50%{background-position:100% 50%;}
   100%{background-position:0% 50%;}
 }
-.button-box button:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 35px rgba(0,255,255,0.7);
-}
 
-/* ===== Modal animado ===== */
+/* Modal */
 .modal{
-  position:fixed;
-  top:0; left:0;
+  position:fixed; top:0; left:0;
   width:100%; height:100%;
   background:rgba(0,0,0,0.7);
   display:none;
@@ -139,9 +160,16 @@ h1{
   color:#000;
   font-weight:bold;
   cursor:pointer;
-  transition:background .2s;
 }
 .modal-content button:hover{background:#7f7;}
+
+footer{
+  margin:40px auto 20px;
+  font-size:.9rem;
+  color:#aaa;
+}
+footer a{color:#0f0;text-decoration:none;margin:0 5px;}
+footer a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -153,13 +181,18 @@ h1{
 
 <h1>🎉 Elegí tu número 🎉</h1>
 
+<div class="stats">
+  Participantes hasta ahora: <span id="contador">0</span> 🎯
+  <div class="ticker" id="ticker"></div>
+</div>
+
 <div class="grid" id="grid"></div>
 
 <div class="button-box">
   <button onclick="reservar()">Reservar número</button>
 </div>
 
-<!-- Modal colorido -->
+<!-- Modal -->
 <div class="modal" id="modal">
   <div class="modal-content">
     <h2>🎯 Número reservado!</h2>
@@ -168,26 +201,42 @@ h1{
   </div>
 </div>
 
+<footer>
+  <p>Seguinos en
+    <a href="https://instagram.com/" target="_blank">Instagram</a> •
+    <a href="https://facebook.com/" target="_blank">Facebook</a>
+    <br><a href="#">Bases y condiciones</a>
+  </p>
+</footer>
+
 <script>
 const grid = document.getElementById('grid');
-let elegido = null;
-let bloqueados = [];
-let cajeroActual = null;
+const contador = document.getElementById('contador');
+const ticker = document.getElementById('ticker');
 const modal = document.getElementById('modal');
 const modalText = document.getElementById('modalText');
 
-// Cargar bloqueados
+let elegido=null, bloqueados=[], cajeroActual=null;
+
 function cargarBloqueados(){
   fetch('/api/bloqueados')
     .then(r=>r.json())
     .then(d=>{ bloqueados=d.bloqueados; renderGrid(); });
 }
-// Obtener cajero
+function cargarStats(){
+  fetch('/api/stats')
+    .then(r=>r.json())
+    .then(d=>{
+      contador.textContent = d.total;
+      ticker.textContent = d.ultimos.length
+        ? 'Últimos números: ' + d.ultimos.join(' - ')
+        : '';
+    });
+}
 fetch('/api/cajero')
   .then(r=>r.json())
   .then(d=>{ cajeroActual=d.cajero; });
 
-// Dibujar grilla
 function renderGrid(){
   grid.innerHTML="";
   for(let i=1;i<=100;i++){
@@ -199,15 +248,13 @@ function renderGrid(){
       div.className='num';
       div.onclick=()=>{if(div.classList.contains('bloqueado'))return;
         document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
-        div.classList.add('selected');
-        elegido=i;
+        div.classList.add('selected'); elegido=i;
       };
     }
     grid.appendChild(div);
   }
 }
 
-// Reservar
 function reservar(){
   if(!elegido || !cajeroActual){
     showModal("Elegí un número libre antes de reservar 😉");
@@ -221,6 +268,8 @@ function reservar(){
   .then(r=>r.json())
   .then(res=>{
     if(res.ok){
+      lanzarConfeti();
+      reproducirSonido();
       showModal(
         `Tu número <b>${elegido}</b> fue reservado ✅<br><br>` +
         `Tu cajero asignado es <b>Facu</b>.<br>` +
@@ -228,27 +277,36 @@ function reservar(){
         `reservar tu numerito (posible ganador 🤑).<br><br>` +
         `Gracias por participar y ¡mucha suerte! 📲🍀`
       );
-      cargarBloqueados();
+      cargarBloqueados(); cargarStats();
       const msg=`Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
       window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
     }else{
       showModal("Ese número ya fue ocupado, elegí otro 😅");
-      cargarBloqueados();
+      cargarBloqueados(); cargarStats();
     }
   });
 }
 
-// Modal helpers
 function showModal(html){
-  modalText.innerHTML = html;
+  modalText.innerHTML=html;
   modal.style.display='flex';
 }
-function cerrarModal(){
-  modal.style.display='none';
+function cerrarModal(){ modal.style.display='none'; }
+
+function lanzarConfeti(){
+  confetti({particleCount:100,spread:70,origin:{y:0.6}});
 }
+function reproducirSonido(){
+  const audio=new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg');
+  audio.play();
+}
+
+// Actualizaciones cada 10 s
+setInterval(cargarStats,10000);
 
 // Primera carga
 cargarBloqueados();
+cargarStats();
 </script>
 
 </body>
