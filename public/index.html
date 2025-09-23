@@ -288,7 +288,7 @@ function confirmarReserva(){
       cerrarModal('modalReserva');
       cargarDatos();
       // ✅ Mensaje actualizado sin la palabra sorteo
-      const msg=`Mi número elegido para el Premio FortunaPlay es el número ${elegido}`;
+      const msg=`Mi número elegido para ganar el Premio Fortuna Play es el número ${elegido}`;
       setTimeout(()=>{
         window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
       },1500);
