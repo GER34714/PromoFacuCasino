@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gana en grande con Fortuna Play™</title>
 
+<!-- ✅ Metadatos Open Graph -->
+<meta property="og:title" content="Gana en grande con Fortuna Play™">
+<meta property="og:description" content="Elegí tu número para participar de la promo y ganar premios increíbles. ¡Entrá y probá tu suerte ahora!">
+<meta property="og:image" content="https://iili.io/KcVxJ6v.md.jpg">
+<meta property="og:url" content="https://tudominio.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fortuna Play™">
+
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -21,21 +29,18 @@ body{
     url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
   overflow-x:hidden;
 }
-
 header img{
   width:min(90%,600px);
   display:block;
   margin:20px auto 10px;
   border-radius:16px;
 }
-
 h1{
   margin:15px 10px;
   color:#0f0;
   text-shadow:0 0 8px rgba(0,255,0,0.6);
   font-size:clamp(1.6rem,5vw,2.6rem);
 }
-
 .stats{
   margin:10px auto;
   width:min(95%,600px);
@@ -60,7 +65,6 @@ h1{
   0%{transform:translateX(100%);}
   100%{transform:translateX(-100%);}
 }
-
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(55px,1fr));
@@ -71,7 +75,6 @@ h1{
   background:rgba(255,255,255,0.05);
   border-radius:16px;
 }
-
 .num{
   background:rgba(255,255,255,0.08);
   padding:12px 0;
@@ -94,8 +97,6 @@ h1{
   text-decoration:line-through;
   cursor:not-allowed;
 }
-
-/* ===== MODAL 100% RESPONSIVE ===== */
 .modal{
   position:fixed;
   top:0;
@@ -108,7 +109,6 @@ h1{
   overflow:auto;
   z-index:1000;
 }
-
 .modal-content{
   background:#222;
   border:2px solid #0f0;
@@ -144,10 +144,7 @@ h1{
   font-size:clamp(1rem,3vw,1.2rem);
   cursor:pointer;
 }
-.modal-content button:hover{
-  transform:scale(1.05);
-}
-
+.modal-content button:hover{transform:scale(1.05);}
 footer{
   margin:40px auto 20px;
   font-size:clamp(.8rem,2.5vw,.9rem);
@@ -156,12 +153,8 @@ footer{
 }
 footer a{color:#0f0;text-decoration:none;margin:0 5px;}
 footer a:hover{text-decoration:underline;}
-
 @media (max-width:480px){
-  .grid{
-    grid-template-columns:repeat(auto-fit, minmax(45px,1fr));
-    gap:6px;
-  }
+  .grid{grid-template-columns:repeat(auto-fit, minmax(45px,1fr));gap:6px;}
 }
 </style>
 </head>
@@ -210,9 +203,7 @@ footer a:hover{text-decoration:underline;}
 
 <footer>
   <p>
-    <a href="https://www.instagram.com/fortunaplay001?igsh=amo3OWdoazFlaGN2" target="_blank">
-      ¡Seguinos en Instagram!
-    </a>
+    <a href="https://www.instagram.com/fortunaplay001?igsh=amo3OWdoazFlaGN2" target="_blank">¡Seguinos en Instagram!</a>
     • <a href="#" onclick="abrirModal('modalBases');return false;">Bases y Condiciones</a>
   </p>
 </footer>
@@ -287,7 +278,6 @@ function confirmarReserva(){
       audio.play();
       cerrarModal('modalReserva');
       cargarDatos();
-      // ✅ Mensaje actualizado sin la palabra sorteo
       const msg=`Mi número elegido para ganar el Premio Fortuna Play es el número ${elegido}`;
       setTimeout(()=>{
         window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
