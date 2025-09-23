@@ -237,23 +237,21 @@ const listaBloqueados=document.getElementById('listaBloqueados');
 const modalText=document.getElementById('modalText');
 let elegido=null,bloqueados=[],cajeroActual=null;
 
-function cargarBloqueados(){
-  fetch('/api/bloqueados').then(r=>r.json()).then(d=>{
-    bloqueados=d.bloqueados;
-    renderGrid();
-    // 👉 mostrar lista
+function cargarDatos(){
+  Promise.all([
+    fetch('/api/bloqueados').then(r=>r.json()),
+    fetch('/api/stats').then(r=>r.json())
+  ]).then(([bloq,stats])=>{
+    bloqueados = bloq.bloqueados;
+    // ✅ el contador es la cantidad de números bloqueados
+    contador.textContent = bloqueados.length;
+    ticker.textContent = stats.ultimos.length
+      ? 'Últimos números: ' + stats.ultimos.join(' - ')
+      : '';
     listaBloqueados.innerHTML = bloqueados.length
       ? 'Números reservados: ' + bloqueados.join(', ')
       : 'Números reservados: ninguno';
-  });
-}
-
-function cargarStats(){
-  fetch('/api/stats').then(r=>r.json()).then(d=>{
-    contador.textContent=d.total;
-    ticker.textContent=d.ultimos.length
-      ? 'Últimos números: ' + d.ultimos.join(' - ')
-      : '';
+    renderGrid();
   });
 }
 
@@ -264,7 +262,6 @@ function renderGrid(){
   for(let i=1;i<=100;i++){
     const div=document.createElement('div');
     div.textContent=i;
-    // Si está reservado → bloqueado + seleccionado
     if(bloqueados.includes(i)){
       div.className='num bloqueado selected';
     }else{
@@ -305,8 +302,7 @@ function confirmarReserva(){
       const audio=new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg');
       audio.play();
       cerrarModal('modalReserva');
-      cargarBloqueados();
-      cargarStats();
+      cargarDatos();
       const msg=`Hola! Mi número elegido para el sorteo es ${elegido}`;
       setTimeout(()=>{
         window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
@@ -317,13 +313,8 @@ function confirmarReserva(){
   });
 }
 
-setInterval(()=>{
-  cargarStats();
-  cargarBloqueados();
-},10000);
-
-cargarBloqueados();
-cargarStats();
+setInterval(cargarDatos,10000);
+cargarDatos();
 </script>
 
 </body>
