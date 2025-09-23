@@ -27,13 +27,12 @@ header img{
   display:block;
   margin:20px auto 10px;
   border-radius:16px;
-  box-shadow:0 0 25px rgba(0,255,0,0.5);
 }
 
 h1{
   margin:15px 10px;
   color:#0f0;
-  text-shadow:0 0 15px rgba(0,255,0,0.8),0 0 30px rgba(0,255,0,0.6);
+  text-shadow:0 0 8px rgba(0,255,0,0.6);
   font-size:clamp(1.6rem,5vw,2.6rem);
 }
 
@@ -49,14 +48,13 @@ h1{
   color:#ffeb3b;
   margin-top:8px;
   font-weight:bold;
-  text-shadow:0 0 8px rgba(255,255,0,0.8);
+  text-shadow:0 0 4px rgba(255,255,0,0.5);
   font-size:clamp(.9rem,2.5vw,1.1rem);
 }
 #listaBloqueados{
   margin-top:10px;
   font-size:clamp(.8rem,2.5vw,1rem);
   color:#0f0;
-  text-shadow:0 0 8px rgba(0,255,0,0.6);
 }
 @keyframes ticker {
   0%{transform:translateX(100%);}
@@ -72,8 +70,6 @@ h1{
   padding:10px;
   background:rgba(255,255,255,0.05);
   border-radius:16px;
-  box-shadow:0 0 20px rgba(0,255,0,0.1);
-  backdrop-filter:blur(6px);
 }
 
 .num{
@@ -84,18 +80,15 @@ h1{
   font-size:clamp(.9rem,3vw,1.1rem);
   font-weight:bold;
   color:#fff;
-  box-shadow:0 0 6px rgba(0,255,0,0.3);
-  transition:all .25s;
+  transition:background .25s, transform .25s;
 }
 .num:hover{
   transform:scale(1.05);
   background:rgba(0,255,0,0.25);
-  box-shadow:0 0 12px rgba(0,255,0,0.6),0 0 18px rgba(0,255,0,0.4);
 }
 .selected{
   background:rgba(0,255,0,0.6);
   color:#000;
-  box-shadow:0 0 16px rgba(0,255,0,0.8),0 0 24px rgba(0,255,0,0.5);
 }
 .bloqueado{
   text-decoration:line-through;
@@ -114,8 +107,8 @@ h1{
   padding:10px;
 }
 .modal-content{
-  background:linear-gradient(135deg,#222,#111);
-  border:3px solid #0f0;
+  background:#222;
+  border:2px solid #0f0;
   border-radius:16px;
   padding:25px;
   width:95%;
@@ -123,7 +116,6 @@ h1{
   text-align:center;
   color:#fff;
   animation:zoomIn .4s ease;
-  box-shadow:0 0 30px rgba(0,255,0,0.6);
 }
 @keyframes zoomIn{
   from{transform:scale(0.5);opacity:0;}
@@ -149,17 +141,9 @@ h1{
   font-weight:bold;
   font-size:clamp(1rem,3vw,1.2rem);
   cursor:pointer;
-  box-shadow:0 0 20px rgba(0,255,255,0.4);
-  animation:gradiente 6s ease infinite;
-}
-@keyframes gradiente{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
 }
 .modal-content button:hover{
   transform:scale(1.05);
-  box-shadow:0 0 30px rgba(0,255,255,0.7);
 }
 
 footer{
@@ -244,19 +228,13 @@ function cargarDatos(){
     fetch('/api/bloqueados').then(r=>r.json())
   ]).then(([bloq])=>{
     bloqueados = bloq.bloqueados;
-    // ✅ contador = cantidad de reservados
     contador.textContent = bloqueados.length;
-
-    // ✅ ticker = todos los reservados
     ticker.textContent = bloqueados.length
       ? '🔥 POSIBLES GANADORES 🔥👉🏻 ' + bloqueados.join(' - ')
       : '🔥 POSIBLES GANADORES 🔥👉🏻 (sin reservas)';
-
-    // ✅ lista = misma info en formato lista
     listaBloqueados.innerHTML = bloqueados.length
       ? 'Números reservados: ' + bloqueados.join(', ')
       : 'Números reservados: ninguno';
-
     renderGrid();
   });
 }
