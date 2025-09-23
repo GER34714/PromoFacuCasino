@@ -9,11 +9,12 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ===== CONFIG =====
-// Números que vos querés reservar de antemano (opcional)
+// Números reservados de antemano (opcional)
 const numerosFijos = [73, 44, 87, 93];
-// Cajeros para rotación de WhatsApp
-const cajeros = ['1125127839', '1112345678'];
-let indiceCajero = 0;
+
+// ✅ Solo Facu en formato internacional (Argentina)
+const cajeros = ['+5491125127839'];
+let indiceCajero = 0; // ya no rota porque solo hay uno
 
 // Archivo de almacenamiento
 const DATA_FILE = path.join(__dirname, 'data.json');
@@ -29,9 +30,10 @@ app.get('/api/bloqueados', (req, res) => {
   res.json({ bloqueados });
 });
 
-// 🔹 Próximo cajero
+// 🔹 Cajero (siempre Facu)
 app.get('/api/cajero', (req, res) => {
   const numero = cajeros[indiceCajero];
+  // aunque haya un solo cajero, dejamos la lógica por si querés volver a rotar
   indiceCajero = (indiceCajero + 1) % cajeros.length;
   res.json({ cajero: numero });
 });
@@ -41,7 +43,7 @@ app.post('/api/registrar', (req, res) => {
   const { numero, telefono } = req.body;
   const lista = JSON.parse(fs.readFileSync(DATA_FILE));
 
-  // Si el número ya está elegido, no lo guardamos de nuevo
+  // Verificar si el número ya está ocupado
   if (lista.some(item => item.numero === numero)) {
     return res.json({ ok: false, mensaje: 'Número ya ocupado' });
   }
