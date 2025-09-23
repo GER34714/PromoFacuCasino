@@ -11,7 +11,6 @@
 <style>
 body{
   font-family:'Segoe UI',Arial,sans-serif;
-  /* Fondo con imagen + degradé oscuro */
   background:
     linear-gradient(135deg, rgba(17,17,17,0.85), rgba(0,0,0,0.85)),
     url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
@@ -34,11 +33,12 @@ h1{
   margin:15px 10px;
   color:#0f0;
   text-shadow:0 0 15px rgba(0,255,0,0.8),0 0 30px rgba(0,255,0,0.6);
+  font-size:clamp(1.5rem,4vw,2.5rem);
 }
 .stats{
   margin:10px auto;
   max-width:600px;
-  font-size:1.1rem;
+  font-size:clamp(1rem,2.5vw,1.2rem);
 }
 .ticker{
   overflow:hidden;
@@ -47,6 +47,7 @@ h1{
   animation:ticker 15s linear infinite;
   color:#0ff;
   margin-top:8px;
+  font-size:clamp(.9rem,2.5vw,1.1rem);
 }
 @keyframes ticker {
   0%{transform:translateX(100%);}
@@ -71,7 +72,7 @@ h1{
   border-radius:10px;
   cursor:pointer;
   transition:all .25s;
-  font-size:1.1rem;
+  font-size:clamp(.9rem,2.5vw,1.1rem);
   font-weight:bold;
 }
 .num:hover{
@@ -91,33 +92,6 @@ h1{
   cursor:not-allowed;
 }
 
-.button-box{
-  margin:25px auto 40px;
-}
-.button-box button{
-  padding:18px 50px;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
-  background-size:600% 600%;
-  color:#000;
-  font-weight:bold;
-  font-size:1.3rem;
-  cursor:pointer;
-  box-shadow:0 10px 20px rgba(0,255,255,0.3);
-  transition:transform .2s, box-shadow .2s;
-  animation:gradiente 6s ease infinite;
-}
-.button-box button:hover{
-  transform:translateY(-3px) scale(1.05);
-  box-shadow:0 15px 25px rgba(0,255,255,0.6);
-}
-@keyframes gradiente{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
-
 /* Modal */
 .modal{
   position:fixed; top:0; left:0;
@@ -127,13 +101,15 @@ h1{
   justify-content:center;
   align-items:center;
   z-index:1000;
+  padding:10px;
 }
 .modal-content{
   background:linear-gradient(135deg,#222,#111);
   border:3px solid #0f0;
   border-radius:16px;
   padding:25px;
-  max-width:350px;
+  width:100%;
+  max-width:360px;
   text-align:center;
   color:#fff;
   animation:zoomIn .4s ease;
@@ -146,26 +122,39 @@ h1{
 .modal-content h2{
   color:#0f0;
   margin-bottom:10px;
+  font-size:clamp(1.3rem,4vw,1.8rem);
 }
 .modal-content p{
-  font-size:1rem;
+  font-size:clamp(.9rem,3vw,1.1rem);
   line-height:1.4;
-  margin-bottom:15px;
+  margin-bottom:20px;
 }
 .modal-content button{
-  padding:10px 30px;
+  padding:14px 40px;
   border:none;
-  border-radius:8px;
-  background:#0f0;
+  border-radius:10px;
+  background:linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
+  background-size:600% 600%;
   color:#000;
   font-weight:bold;
+  font-size:clamp(1rem,3vw,1.2rem);
   cursor:pointer;
+  box-shadow:0 0 20px rgba(0,255,255,0.4);
+  animation:gradiente 6s ease infinite;
 }
-.modal-content button:hover{background:#7f7;}
+@keyframes gradiente{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+.modal-content button:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 30px rgba(0,255,255,0.7);
+}
 
 footer{
   margin:40px auto 20px;
-  font-size:.9rem;
+  font-size:clamp(.8rem,2.5vw,.9rem);
   color:#aaa;
 }
 footer a{color:#0f0;text-decoration:none;margin:0 5px;}
@@ -175,7 +164,6 @@ footer a:hover{text-decoration:underline;}
 <body>
 
 <header>
-  <!-- 🆕 Nuevo logo -->
   <img src="https://iili.io/KaQZyss.md.jpg" alt="Fortuna Play Logo">
 </header>
 
@@ -188,15 +176,13 @@ footer a:hover{text-decoration:underline;}
 
 <div class="grid" id="grid"></div>
 
-<div class="button-box">
-  <button onclick="reservar()">Reservar número</button>
-</div>
-
-<!-- Modal -->
+<!-- Modal con botón dentro -->
 <div class="modal" id="modal">
   <div class="modal-content">
-    <h2>🎯 Número reservado!</h2>
+    <h2>Confirmá tu reserva</h2>
     <p id="modalText"></p>
+    <button onclick="confirmarReserva()">Reservar número</button>
+    <br><br>
     <button onclick="cerrarModal()">Cerrar</button>
   </div>
 </div>
@@ -218,6 +204,7 @@ const modalText = document.getElementById('modalText');
 
 let elegido=null, bloqueados=[], cajeroActual=null;
 
+// Cargar datos
 function cargarBloqueados(){
   fetch('/api/bloqueados')
     .then(r=>r.json())
@@ -246,18 +233,31 @@ function renderGrid(){
       div.className='num bloqueado';
     }else{
       div.className='num';
-      div.onclick=()=>{if(div.classList.contains('bloqueado'))return;
+      div.onclick=()=>{
+        if(div.classList.contains('bloqueado'))return;
         document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
-        div.classList.add('selected'); elegido=i;
+        div.classList.add('selected'); 
+        elegido=i;
+        showModal(
+          `Tu número elegido es <b>${elegido}</b> ✅<br><br>` +
+          `Tu cajero asignado es <b>Facu</b>.<br>` +
+          `Presioná <b>Reservar número</b> para confirmar y abrir WhatsApp.`
+        );
       };
     }
     grid.appendChild(div);
   }
 }
 
-function reservar(){
+function showModal(html){
+  modalText.innerHTML=html;
+  modal.style.display='flex';
+}
+function cerrarModal(){ modal.style.display='none'; }
+
+function confirmarReserva(){
   if(!elegido || !cajeroActual){
-    showModal("Elegí un número libre antes de reservar 😉");
+    cerrarModal();
     return;
   }
   fetch('/api/registrar',{
@@ -270,28 +270,16 @@ function reservar(){
     if(res.ok){
       lanzarConfeti();
       reproducirSonido();
-      showModal(
-        `Tu número <b>${elegido}</b> fue reservado ✅<br><br>` +
-        `Tu cajero asignado es <b>Facu</b>.<br>` +
-        `Escribile por WhatsApp para solicitar tu carga y ` +
-        `reservar tu numerito (posible ganador 🤑).<br><br>` +
-        `Gracias por participar y ¡mucha suerte! 📲🍀`
-      );
-      cargarBloqueados(); cargarStats();
+      cerrarModal();
+      cargarBloqueados(); 
+      cargarStats();
       const msg=`Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
       window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
     }else{
-      showModal("Ese número ya fue ocupado, elegí otro 😅");
-      cargarBloqueados(); cargarStats();
+      modalText.innerHTML="Ese número ya fue ocupado, elegí otro 😅";
     }
   });
 }
-
-function showModal(html){
-  modalText.innerHTML=html;
-  modal.style.display='flex';
-}
-function cerrarModal(){ modal.style.display='none'; }
 
 function lanzarConfeti(){
   confetti({particleCount:100,spread:70,origin:{y:0.6}});
