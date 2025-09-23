@@ -45,9 +45,11 @@ h1{
 .ticker{
   overflow:hidden;
   white-space:nowrap;
-  animation:ticker 15s linear infinite;
-  color:#0ff;
+  animation:ticker 25s linear infinite;
+  color:#ffeb3b;
   margin-top:8px;
+  font-weight:bold;
+  text-shadow:0 0 8px rgba(255,255,0,0.8);
   font-size:clamp(.9rem,2.5vw,1.1rem);
 }
 #listaBloqueados{
@@ -187,7 +189,7 @@ footer a:hover{text-decoration:underline;}
 
 <div class="stats">
   Participantes hasta ahora: <span id="contador">0</span> 🎯
-  <div class="ticker" id="ticker"></div>
+  <div class="ticker" id="ticker">🔥 POSIBLES GANADORES 🔥👉🏻</div>
   <div id="listaBloqueados">Números reservados: ninguno</div>
 </div>
 
@@ -239,18 +241,22 @@ let elegido=null,bloqueados=[],cajeroActual=null;
 
 function cargarDatos(){
   Promise.all([
-    fetch('/api/bloqueados').then(r=>r.json()),
-    fetch('/api/stats').then(r=>r.json())
-  ]).then(([bloq,stats])=>{
+    fetch('/api/bloqueados').then(r=>r.json())
+  ]).then(([bloq])=>{
     bloqueados = bloq.bloqueados;
-    // ✅ el contador es la cantidad de números bloqueados
+    // ✅ contador = cantidad de reservados
     contador.textContent = bloqueados.length;
-    ticker.textContent = stats.ultimos.length
-      ? 'Últimos números: ' + stats.ultimos.join(' - ')
-      : '';
+
+    // ✅ ticker = todos los reservados
+    ticker.textContent = bloqueados.length
+      ? '🔥 POSIBLES GANADORES 🔥👉🏻 ' + bloqueados.join(' - ')
+      : '🔥 POSIBLES GANADORES 🔥👉🏻 (sin reservas)';
+
+    // ✅ lista = misma info en formato lista
     listaBloqueados.innerHTML = bloqueados.length
       ? 'Números reservados: ' + bloqueados.join(', ')
       : 'Números reservados: ninguno';
+
     renderGrid();
   });
 }
