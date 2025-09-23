@@ -50,12 +50,17 @@ h1{
   margin-top:8px;
   font-size:clamp(.9rem,2.5vw,1.1rem);
 }
+#listaBloqueados{
+  margin-top:10px;
+  font-size:clamp(.8rem,2.5vw,1rem);
+  color:#0f0;
+  text-shadow:0 0 8px rgba(0,255,0,0.6);
+}
 @keyframes ticker {
   0%{transform:translateX(100%);}
   100%{transform:translateX(-100%);}
 }
 
-/* ===== GRILLA ===== */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(55px,1fr));
@@ -77,7 +82,6 @@ h1{
   font-size:clamp(.9rem,3vw,1.1rem);
   font-weight:bold;
   color:#fff;
-  /* brillo fijo muy suave */
   box-shadow:0 0 6px rgba(0,255,0,0.3);
   transition:all .25s;
 }
@@ -92,11 +96,8 @@ h1{
   box-shadow:0 0 16px rgba(0,255,0,0.8),0 0 24px rgba(0,255,0,0.5);
 }
 .bloqueado{
-  background:rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.4);
   text-decoration:line-through;
   cursor:not-allowed;
-  box-shadow:none;
 }
 
 .modal{
@@ -187,6 +188,7 @@ footer a:hover{text-decoration:underline;}
 <div class="stats">
   Participantes hasta ahora: <span id="contador">0</span> 🎯
   <div class="ticker" id="ticker"></div>
+  <div id="listaBloqueados">Números reservados: ninguno</div>
 </div>
 
 <div class="grid" id="grid"></div>
@@ -231,6 +233,7 @@ footer a:hover{text-decoration:underline;}
 const grid=document.getElementById('grid');
 const contador=document.getElementById('contador');
 const ticker=document.getElementById('ticker');
+const listaBloqueados=document.getElementById('listaBloqueados');
 const modalText=document.getElementById('modalText');
 let elegido=null,bloqueados=[],cajeroActual=null;
 
@@ -238,14 +241,22 @@ function cargarBloqueados(){
   fetch('/api/bloqueados').then(r=>r.json()).then(d=>{
     bloqueados=d.bloqueados;
     renderGrid();
+    // 👉 mostrar lista
+    listaBloqueados.innerHTML = bloqueados.length
+      ? 'Números reservados: ' + bloqueados.join(', ')
+      : 'Números reservados: ninguno';
   });
 }
+
 function cargarStats(){
   fetch('/api/stats').then(r=>r.json()).then(d=>{
     contador.textContent=d.total;
-    ticker.textContent=d.ultimos.length ? 'Últimos números: '+d.ultimos.join(' - ') : '';
+    ticker.textContent=d.ultimos.length
+      ? 'Últimos números: ' + d.ultimos.join(' - ')
+      : '';
   });
 }
+
 fetch('/api/cajero').then(r=>r.json()).then(d=>{cajeroActual=d.cajero;});
 
 function renderGrid(){
@@ -253,8 +264,9 @@ function renderGrid(){
   for(let i=1;i<=100;i++){
     const div=document.createElement('div');
     div.textContent=i;
+    // Si está reservado → bloqueado + seleccionado
     if(bloqueados.includes(i)){
-      div.className='num bloqueado';
+      div.className='num bloqueado selected';
     }else{
       div.className='num';
       div.onclick=()=>{
@@ -296,14 +308,20 @@ function confirmarReserva(){
       cargarBloqueados();
       cargarStats();
       const msg=`Hola! Mi número elegido para el sorteo es ${elegido}`;
-      window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
+      setTimeout(()=>{
+        window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
+      },1500);
     }else{
       modalText.innerHTML="Ese número ya fue ocupado, elegí otro 😅";
     }
   });
 }
 
-setInterval(cargarStats,10000);
+setInterval(()=>{
+  cargarStats();
+  cargarBloqueados();
+},10000);
+
 cargarBloqueados();
 cargarStats();
 </script>
