@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sorteo Fortuna Play™</title>
 
-<!-- 🎉 Librería de confeti -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -92,7 +91,7 @@ h1{
   cursor:not-allowed;
 }
 
-/* Modal */
+/* Modal genérico */
 .modal{
   position:fixed; top:0; left:0;
   width:100%; height:100%;
@@ -176,22 +175,39 @@ footer a:hover{text-decoration:underline;}
 
 <div class="grid" id="grid"></div>
 
-<!-- Modal con botón dentro -->
-<div class="modal" id="modal">
+<!-- Modal de reserva -->
+<div class="modal" id="modalReserva">
   <div class="modal-content">
     <h2>Confirmá tu reserva</h2>
     <p id="modalText"></p>
     <button onclick="confirmarReserva()">Reservar número</button>
     <br><br>
-    <button onclick="cerrarModal()">Cerrar</button>
+    <button onclick="cerrarModal('modalReserva')">Cerrar</button>
+  </div>
+</div>
+
+<!-- Modal Bases y Condiciones -->
+<div class="modal" id="modalBases">
+  <div class="modal-content" style="text-align:left;">
+    <h2>Bases y Condiciones</h2>
+    <p>
+      • La participación es gratuita y voluntaria.<br>
+      • Cada persona puede reservar solo un número.<br>
+      • El número ganador será publicado en la página de ganador en la fecha anunciada.<br>
+      • El premio se coordinará únicamente con el número de WhatsApp utilizado para la reserva.<br>
+      • La organización se reserva el derecho de validar los datos y de anular reservas fraudulentas.<br>
+      • Al participar aceptás estas condiciones.
+    </p>
+    <button onclick="cerrarModal('modalBases')">Cerrar</button>
   </div>
 </div>
 
 <footer>
-  <p>Seguinos en
-    <a href="https://instagram.com/" target="_blank">Instagram</a> •
-    <a href="https://facebook.com/" target="_blank">Facebook</a>
-    <br><a href="#">Bases y condiciones</a>
+  <p>
+    <a href="https://www.instagram.com/fortunaplay001?igsh=amo3OWdoazFlaGN2" target="_blank">
+      ¡Seguinos en Instagram!
+    </a>
+    • <a href="#" onclick="abrirModal('modalBases');return false;">Bases y Condiciones</a>
   </p>
 </footer>
 
@@ -199,7 +215,7 @@ footer a:hover{text-decoration:underline;}
 const grid = document.getElementById('grid');
 const contador = document.getElementById('contador');
 const ticker = document.getElementById('ticker');
-const modal = document.getElementById('modal');
+const modalReserva = document.getElementById('modalReserva');
 const modalText = document.getElementById('modalText');
 
 let elegido=null, bloqueados=[], cajeroActual=null;
@@ -238,7 +254,7 @@ function renderGrid(){
         document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
         div.classList.add('selected'); 
         elegido=i;
-        showModal(
+        abrirModal('modalReserva',
           `Tu número elegido es <b>${elegido}</b> ✅<br><br>` +
           `Tu cajero asignado es <b>Facu</b>.<br>` +
           `Presioná <b>Reservar número</b> para confirmar y abrir WhatsApp.`
@@ -249,15 +265,18 @@ function renderGrid(){
   }
 }
 
-function showModal(html){
-  modalText.innerHTML=html;
+function abrirModal(id,texto=""){
+  const modal=document.getElementById(id);
+  if(texto) modalText.innerHTML=texto;
   modal.style.display='flex';
 }
-function cerrarModal(){ modal.style.display='none'; }
+function cerrarModal(id){
+  document.getElementById(id).style.display='none';
+}
 
 function confirmarReserva(){
   if(!elegido || !cajeroActual){
-    cerrarModal();
+    cerrarModal('modalReserva');
     return;
   }
   fetch('/api/registrar',{
@@ -270,7 +289,7 @@ function confirmarReserva(){
     if(res.ok){
       lanzarConfeti();
       reproducirSonido();
-      cerrarModal();
+      cerrarModal('modalReserva');
       cargarBloqueados(); 
       cargarStats();
       const msg=`Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
