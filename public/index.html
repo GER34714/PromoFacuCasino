@@ -68,47 +68,78 @@ h1{
   text-decoration:line-through;
   cursor:not-allowed;
 }
-.input-box{
-  margin:20px auto;
-  max-width:400px;
-  padding:0 10px;
-}
-.input-box input{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:8px;
-  font-size:1rem;
-  text-align:center;
-  background:rgba(255,255,255,0.1);
-  color:#fff;
-  box-shadow:0 0 10px rgba(0,255,0,0.2);
-  backdrop-filter:blur(4px);
-}
-.input-box input::placeholder{color:rgba(255,255,255,0.5);}
 .button-box{
-  margin:20px auto 40px;
+  margin:25px auto 40px;
 }
 .button-box button{
-  padding:16px 40px;
+  padding:18px 50px;
   border:none;
-  border-radius:10px;
-  background:linear-gradient(45deg,rgba(0,255,0,0.8),rgba(0,200,200,0.8));
+  border-radius:12px;
+  background:linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
+  background-size:600% 600%;
   color:#000;
   font-weight:bold;
-  font-size:1.1rem;
+  font-size:1.3rem;
   cursor:pointer;
-  box-shadow:0 0 20px rgba(0,255,0,0.4);
-  transition:transform .2s, box-shadow .2s;
+  box-shadow:0 0 25px rgba(0,255,255,0.4);
+  animation:gradiente 6s ease infinite;
+}
+@keyframes gradiente{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 .button-box button:hover{
   transform:scale(1.05);
-  box-shadow:0 0 30px rgba(0,255,0,0.7);
+  box-shadow:0 0 35px rgba(0,255,255,0.7);
 }
-@media (max-width:480px){
-  .num{font-size:.9rem;padding:10px 0;}
-  .button-box button{width:90%;}
+
+/* ===== Modal animado ===== */
+.modal{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
 }
+.modal-content{
+  background:linear-gradient(135deg,#222,#111);
+  border:3px solid #0f0;
+  border-radius:16px;
+  padding:25px;
+  max-width:350px;
+  text-align:center;
+  color:#fff;
+  animation:zoomIn .4s ease;
+  box-shadow:0 0 30px rgba(0,255,0,0.6);
+}
+@keyframes zoomIn{
+  from{transform:scale(0.5);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+.modal-content h2{
+  color:#0f0;
+  margin-bottom:10px;
+}
+.modal-content p{
+  font-size:1rem;
+  line-height:1.4;
+  margin-bottom:15px;
+}
+.modal-content button{
+  padding:10px 30px;
+  border:none;
+  border-radius:8px;
+  background:#0f0;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+  transition:background .2s;
+}
+.modal-content button:hover{background:#7f7;}
 </style>
 </head>
 <body>
@@ -121,12 +152,17 @@ h1{
 
 <div class="grid" id="grid"></div>
 
-<div class="input-box">
-  <input type="text" id="whatsapp" placeholder="Tu WhatsApp (solo números)">
-</div>
-
 <div class="button-box">
   <button onclick="reservar()">Reservar número</button>
+</div>
+
+<!-- Modal colorido -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2>🎯 Número reservado!</h2>
+    <p id="modalText"></p>
+    <button onclick="cerrarModal()">Cerrar</button>
+  </div>
 </div>
 
 <script>
@@ -134,70 +170,78 @@ const grid = document.getElementById('grid');
 let elegido = null;
 let bloqueados = [];
 let cajeroActual = null;
+const modal = document.getElementById('modal');
+const modalText = document.getElementById('modalText');
 
-// 🔹 Cargar lista de bloqueados
+// Cargar bloqueados
 function cargarBloqueados(){
   fetch('/api/bloqueados')
-    .then(r => r.json())
-    .then(d => { bloqueados = d.bloqueados; renderGrid(); });
+    .then(r=>r.json())
+    .then(d=>{ bloqueados=d.bloqueados; renderGrid(); });
 }
-
-// 🔹 Obtener cajero (siempre Facu en este backend)
+// Obtener cajero
 fetch('/api/cajero')
-  .then(r => r.json())
-  .then(d => { cajeroActual = d.cajero; });
+  .then(r=>r.json())
+  .then(d=>{ cajeroActual=d.cajero; });
 
-// 🔹 Dibujar grilla
-function renderGrid() {
-  grid.innerHTML = "";
-  for (let i = 1; i <= 100; i++) {
-    const div = document.createElement('div');
-    div.textContent = i;
-    if (bloqueados.includes(i)) {
-      div.className = 'num bloqueado';
-    } else {
-      div.className = 'num';
-      div.onclick = () => {
-        if (div.classList.contains('bloqueado')) return;
-        document.querySelectorAll('.num').forEach(n => n.classList.remove('selected'));
+// Dibujar grilla
+function renderGrid(){
+  grid.innerHTML="";
+  for(let i=1;i<=100;i++){
+    const div=document.createElement('div');
+    div.textContent=i;
+    if(bloqueados.includes(i)){
+      div.className='num bloqueado';
+    }else{
+      div.className='num';
+      div.onclick=()=>{if(div.classList.contains('bloqueado'))return;
+        document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
         div.classList.add('selected');
-        elegido = i;
+        elegido=i;
       };
     }
     grid.appendChild(div);
   }
 }
 
-// 🔹 Reservar número
-function reservar() {
-  const tel = document.getElementById('whatsapp').value.trim();
-  if (!elegido || !tel || !cajeroActual) {
-    alert("Elegí un número libre y poné tu WhatsApp");
+// Reservar
+function reservar(){
+  if(!elegido || !cajeroActual){
+    showModal("Elegí un número libre antes de reservar 😉");
     return;
   }
-  fetch('/api/registrar', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ numero: elegido, telefono: tel })
+  fetch('/api/registrar',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({numero:elegido,telefono:'sin-dato'})
   })
-  .then(r => r.json())
-  .then(res => {
-    if (res.ok) {
-      alert(
-        `🎉 Tu número ${elegido} fue reservado!\n\n` +
-        `Tu cajero asignado va a ser Facu ✅\n\n` +
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.ok){
+      showModal(
+        `Tu número <b>${elegido}</b> fue reservado ✅<br><br>` +
+        `Tu cajero asignado es <b>Facu</b>.<br>` +
         `Escribile por WhatsApp para solicitar tu carga y ` +
-        `reservar tu numerito (posible ganador 🤑)\n\n` +
-        `Gracias por participar y mucha suerte 📲🍀`
+        `reservar tu numerito (posible ganador 🤑).<br><br>` +
+        `Gracias por participar y ¡mucha suerte! 📲🍀`
       );
       cargarBloqueados();
-      const msg = `Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
-      window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`, '_blank');
-    } else {
-      alert("Ese número ya fue ocupado, elegí otro");
+      const msg=`Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
+      window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
+    }else{
+      showModal("Ese número ya fue ocupado, elegí otro 😅");
       cargarBloqueados();
     }
   });
+}
+
+// Modal helpers
+function showModal(html){
+  modalText.innerHTML = html;
+  modal.style.display='flex';
+}
+function cerrarModal(){
+  modal.style.display='none';
 }
 
 // Primera carga
