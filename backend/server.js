@@ -1,71 +1,310 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sorteo Fortuna Play™</title>
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, '..', 'public')));
+<!-- Confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-// ===== CONFIG =====
-// Números reservados de antemano (opcional)
-const numerosFijos = [73, 44, 87, 93];
+<style>
+body{
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:
+    linear-gradient(135deg, rgba(17,17,17,0.85), rgba(0,0,0,0.85)),
+    url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
+  color:#fff;
+  text-align:center;
+  margin:0;
+  padding:0;
+}
+header img{
+  width:90%;
+  max-width:600px;
+  display:block;
+  margin:20px auto 10px;
+  border-radius:16px;
+  box-shadow:0 0 25px rgba(0,255,0,0.5);
+  backdrop-filter:blur(5px);
+}
+h1{
+  margin:15px 10px;
+  color:#0f0;
+  text-shadow:0 0 15px rgba(0,255,0,0.8),0 0 30px rgba(0,255,0,0.6);
+}
+.stats{
+  margin:10px auto;
+  max-width:600px;
+  font-size:1.1rem;
+}
+.ticker{
+  overflow:hidden;
+  white-space:nowrap;
+  box-sizing:border-box;
+  animation:ticker 15s linear infinite;
+  color:#0ff;
+  margin-top:8px;
+}
+@keyframes ticker {
+  0%{transform:translateX(100%);}
+  100%{transform:translateX(-100%);}
+}
 
-// ✅ Solo Facu en formato internacional (Argentina)
-const cajeros = ['+5491125127839'];
-let indiceCajero = 0; // ya no rota porque solo hay uno
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(50px,1fr));
+  gap:8px;
+  max-width:600px;
+  margin:20px auto;
+  padding:10px;
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+  box-shadow:0 0 20px rgba(0,255,0,0.1);
+  backdrop-filter:blur(6px);
+}
+.num{
+  background:rgba(255,255,255,0.1);
+  padding:12px 0;
+  border-radius:10px;
+  cursor:pointer;
+  transition:all .25s;
+  font-size:1.1rem;
+  font-weight:bold;
+}
+.num:hover{
+  background:rgba(0,255,0,0.3);
+  color:#000;
+  box-shadow:0 0 12px rgba(0,255,0,0.7);
+}
+.selected{
+  background:rgba(0,255,0,0.6);
+  color:#000;
+  box-shadow:0 0 18px rgba(0,255,0,0.8);
+}
+.bloqueado{
+  background:rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);
+  text-decoration:line-through;
+  cursor:not-allowed;
+}
 
-// Archivo de almacenamiento
-const DATA_FILE = path.join(__dirname, 'data.json');
-if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]');
+.button-box{
+  margin:25px auto 40px;
+}
+.button-box button{
+  padding:18px 50px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
+  background-size:600% 600%;
+  color:#000;
+  font-weight:bold;
+  font-size:1.3rem;
+  cursor:pointer;
+  box-shadow:0 10px 20px rgba(0,255,255,0.3);
+  transition:transform .2s, box-shadow .2s;
+  animation:gradiente 6s ease infinite;
+}
+.button-box button:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 15px 25px rgba(0,255,255,0.6);
+}
+@keyframes gradiente{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
 
-// ===== RUTAS =====
+/* Modal */
+.modal{
+  position:fixed; top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-content{
+  background:linear-gradient(135deg,#222,#111);
+  border:3px solid #0f0;
+  border-radius:16px;
+  padding:25px;
+  max-width:350px;
+  text-align:center;
+  color:#fff;
+  animation:zoomIn .4s ease;
+  box-shadow:0 0 30px rgba(0,255,0,0.6);
+}
+@keyframes zoomIn{
+  from{transform:scale(0.5);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+.modal-content h2{
+  color:#0f0;
+  margin-bottom:10px;
+}
+.modal-content p{
+  font-size:1rem;
+  line-height:1.4;
+  margin-bottom:15px;
+}
+.modal-content button{
+  padding:10px 30px;
+  border:none;
+  border-radius:8px;
+  background:#0f0;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+}
+.modal-content button:hover{background:#7f7;}
 
-// 🔹 Bloqueados: fijos + todos los que ya eligieron
-app.get('/api/bloqueados', (req, res) => {
-  const lista = JSON.parse(fs.readFileSync(DATA_FILE));
-  const elegidos = lista.map(item => item.numero);
-  const bloqueados = Array.from(new Set([...numerosFijos, ...elegidos]));
-  res.json({ bloqueados });
-});
+footer{
+  margin:40px auto 20px;
+  font-size:.9rem;
+  color:#aaa;
+}
+footer a{color:#0f0;text-decoration:none;margin:0 5px;}
+footer a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
 
-// 🔹 Cajero (siempre Facu)
-app.get('/api/cajero', (req, res) => {
-  const numero = cajeros[indiceCajero];
-  // aunque haya un solo cajero, dejamos la lógica por si querés volver a rotar
-  indiceCajero = (indiceCajero + 1) % cajeros.length;
-  res.json({ cajero: numero });
-});
+<header>
+  <img src="https://iili.io/KaQZyss.md.jpg" alt="Fortuna Play Logo">
+</header>
 
-// 🔹 Registrar elección
-app.post('/api/registrar', (req, res) => {
-  const { numero, telefono } = req.body;
-  const lista = JSON.parse(fs.readFileSync(DATA_FILE));
+<h1>🎉 Elegí tu número 🎉</h1>
 
-  // Verificar si el número ya está ocupado
-  if (lista.some(item => item.numero === numero)) {
-    return res.json({ ok: false, mensaje: 'Número ya ocupado' });
+<div class="stats">
+  Participantes hasta ahora: <span id="contador">0</span> 🎯
+  <div class="ticker" id="ticker"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="button-box">
+  <button onclick="reservar()">Reservar número</button>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2>🎯 Número reservado!</h2>
+    <p id="modalText"></p>
+    <button onclick="cerrarModal()">Cerrar</button>
+  </div>
+</div>
+
+<footer>
+  <p>Seguinos en
+    <a href="https://instagram.com/" target="_blank">Instagram</a> •
+    <a href="https://facebook.com/" target="_blank">Facebook</a>
+    <br><a href="#">Bases y condiciones</a>
+  </p>
+</footer>
+
+<script>
+const grid = document.getElementById('grid');
+const contador = document.getElementById('contador');
+const ticker = document.getElementById('ticker');
+const modal = document.getElementById('modal');
+const modalText = document.getElementById('modalText');
+
+let elegido=null, bloqueados=[], cajeroActual=null;
+
+function cargarBloqueados(){
+  fetch('/api/bloqueados')
+    .then(r=>r.json())
+    .then(d=>{ bloqueados=d.bloqueados; renderGrid(); });
+}
+function cargarStats(){
+  fetch('/api/stats')
+    .then(r=>r.json())
+    .then(d=>{
+      contador.textContent = d.total;
+      ticker.textContent = d.ultimos.length
+        ? 'Últimos números: ' + d.ultimos.join(' - ')
+        : '';
+    });
+}
+fetch('/api/cajero')
+  .then(r=>r.json())
+  .then(d=>{ cajeroActual=d.cajero; });
+
+function renderGrid(){
+  grid.innerHTML="";
+  for(let i=1;i<=100;i++){
+    const div=document.createElement('div');
+    div.textContent=i;
+    if(bloqueados.includes(i)){
+      div.className='num bloqueado';
+    }else{
+      div.className='num';
+      div.onclick=()=>{if(div.classList.contains('bloqueado'))return;
+        document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
+        div.classList.add('selected'); elegido=i;
+      };
+    }
+    grid.appendChild(div);
   }
+}
 
-  const cajeroAsignado = cajeros[(indiceCajero - 1 + cajeros.length) % cajeros.length];
-  lista.push({ numero, telefono, cajeroAsignado, fecha: new Date() });
-  fs.writeFileSync(DATA_FILE, JSON.stringify(lista, null, 2));
-  res.json({ ok: true });
-});
+function reservar(){
+  if(!elegido || !cajeroActual){
+    showModal("Elegí un número libre antes de reservar 😉");
+    return;
+  }
+  fetch('/api/registrar',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({numero:elegido,telefono:'sin-dato'})
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.ok){
+      lanzarConfeti();
+      reproducirSonido();
+      showModal(
+        `Tu número <b>${elegido}</b> fue reservado ✅<br><br>` +
+        `Tu cajero asignado es <b>Facu</b>.<br>` +
+        `Escribile por WhatsApp para solicitar tu carga y ` +
+        `reservar tu numerito (posible ganador 🤑).<br><br>` +
+        `Gracias por participar y ¡mucha suerte! 📲🍀`
+      );
+      cargarBloqueados(); cargarStats();
+      const msg=`Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
+      window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
+    }else{
+      showModal("Ese número ya fue ocupado, elegí otro 😅");
+      cargarBloqueados(); cargarStats();
+    }
+  });
+}
 
-// 🔹 Número ganador (para ganador.html)
-app.get('/api/ganador', (req, res) => {
-  res.json({ ganador: 93 });
-});
+function showModal(html){
+  modalText.innerHTML=html;
+  modal.style.display='flex';
+}
+function cerrarModal(){ modal.style.display='none'; }
 
-// ===== START =====
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Servidor corriendo en puerto', PORT));
-// 🔹 Contador y últimos números
-app.get('/api/stats', (req, res) => {
-  const lista = JSON.parse(fs.readFileSync(DATA_FILE));
-  const total = lista.length;
-  const ultimos = lista.slice(-5).reverse().map(item => item.numero);
-  res.json({ total, ultimos });
-});
+function lanzarConfeti(){
+  confetti({particleCount:100,spread:70,origin:{y:0.6}});
+}
+function reproducirSonido(){
+  const audio=new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg');
+  audio.play();
+}
+
+// Actualizaciones periódicas
+setInterval(cargarStats,10000);
+
+// Primera carga
+cargarBloqueados();
+cargarStats();
+</script>
+
+</body>
+</html>
