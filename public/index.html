@@ -95,36 +95,33 @@ h1{
   cursor:not-allowed;
 }
 
-/* ===== MODAL RESPONSIVE ===== */
+/* ===== MODAL 100% RESPONSIVE ===== */
 .modal{
   position:fixed;
-  top:0; left:0;
-  width:100%;
-  height:100%;
+  top:0;
+  left:0;
+  width:100vw;             /* ocupa toda la ventana */
+  height:100vh;
   background:rgba(0,0,0,0.7);
-  display:none;
-  justify-content:center;
-  align-items:center;
+  display:none;            /* visible en JS */
+  padding:16px;
+  overflow:auto;           /* scroll vertical si es necesario */
   z-index:1000;
-  padding:10px;          /* espacio interno */
-  overflow:auto;         /* por si necesita scroll vertical */
 }
 
 .modal-content{
   background:#222;
   border:2px solid #0f0;
   border-radius:16px;
-  padding:clamp(16px,5vw,25px);   /* padding fluido */
-  width:100%;                      /* ocupa todo el ancho disponible */
-  max-width:360px;                  /* tope en pantallas grandes */
-  box-sizing:border-box;            /* incluye padding en el cálculo */
+  width:calc(100% - 32px);  /* siempre cabe dentro de la pantalla */
+  max-width:360px;          /* tope en pantallas grandes */
+  max-height:calc(100% - 32px);
+  padding:clamp(16px,5vw,25px);
+  margin:40px auto;         /* centra horizontal y agrega espacio arriba/abajo */
+  box-sizing:border-box;
   text-align:center;
   color:#fff;
-  animation:zoomIn .4s ease;
-}
-@keyframes zoomIn{
-  from{transform:scale(0.5);opacity:0;}
-  to{transform:scale(1);opacity:1;}
+  overflow-y:auto;          /* scroll interno si hay mucho texto */
 }
 .modal-content h2{
   color:#0f0;
@@ -229,9 +226,7 @@ const modalText=document.getElementById('modalText');
 let elegido=null,bloqueados=[],cajeroActual=null;
 
 function cargarDatos(){
-  Promise.all([
-    fetch('/api/bloqueados').then(r=>r.json())
-  ]).then(([bloq])=>{
+  fetch('/api/bloqueados').then(r=>r.json()).then(bloq=>{
     bloqueados = bloq.bloqueados;
     contador.textContent = bloqueados.length;
     ticker.textContent = bloqueados.length
@@ -273,7 +268,7 @@ function renderGrid(){
 function abrirModal(id,texto=""){
   const modal=document.getElementById(id);
   if(texto) modalText.innerHTML=texto;
-  modal.style.display='flex';
+  modal.style.display='block';
 }
 function cerrarModal(id){
   document.getElementById(id).style.display='none';
