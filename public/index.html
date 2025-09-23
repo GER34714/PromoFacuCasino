@@ -8,153 +8,154 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
-/* ==== RESET & BASE ==== */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-html, body {
-  margin: 0;
-  padding: 0;
-}
+html, body {margin:0;padding:0;}
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  color: #fff;
-  text-align: center;
+  font-family:'Segoe UI',Arial,sans-serif;
+  color:#fff;
+  text-align:center;
   background:
     linear-gradient(135deg, rgba(17,17,17,0.85), rgba(0,0,0,0.85)),
     url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
-  overflow-x: hidden; /* 🔥 evita scroll lateral */
+  overflow-x:hidden;
 }
 
-/* ==== HEADER ==== */
 header img {
-  width: min(90%, 600px);
-  height: auto;
-  display: block;
-  margin: 20px auto 10px;
-  border-radius: 16px;
-  box-shadow: 0 0 25px rgba(0,255,0,0.5);
-  backdrop-filter: blur(5px);
+  width:min(90%,600px);
+  display:block;
+  margin:20px auto 10px;
+  border-radius:16px;
+  box-shadow:0 0 25px rgba(0,255,0,0.5);
+  backdrop-filter:blur(5px);
 }
 
 h1 {
-  margin: 15px 10px;
-  color: #0f0;
-  text-shadow: 0 0 15px rgba(0,255,0,0.8),0 0 30px rgba(0,255,0,0.6);
-  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  margin:15px 10px;
+  color:#0f0;
+  text-shadow:0 0 15px rgba(0,255,0,0.8),0 0 30px rgba(0,255,0,0.6);
+  font-size:clamp(1.6rem,5vw,2.6rem);
 }
 
-/* ==== STATS ==== */
 .stats {
-  margin: 10px auto;
-  width: min(95%, 600px);
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  margin:10px auto;
+  width:min(95%,600px);
+  font-size:clamp(1rem,2.5vw,1.2rem);
 }
 .ticker {
-  overflow: hidden;
-  white-space: nowrap;
-  box-sizing: border-box;
-  animation: ticker 15s linear infinite;
-  color: #0ff;
-  margin-top: 8px;
-  font-size: clamp(.9rem, 2.5vw, 1.1rem);
+  overflow:hidden;
+  white-space:nowrap;
+  animation:ticker 15s linear infinite;
+  color:#0ff;
+  margin-top:8px;
+  font-size:clamp(.9rem,2.5vw,1.1rem);
 }
 @keyframes ticker {
-  0% {transform: translateX(100%);}
-  100% {transform: translateX(-100%);}
+  0%{transform:translateX(100%);}
+  100%{transform:translateX(-100%);}
 }
 
-/* ==== GRID ==== */
+/* ===== GRILLA ===== */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
-  gap: 8px;
-  width: min(95%, 600px);
-  margin: 20px auto;
-  padding: 10px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 16px;
-  box-shadow: 0 0 20px rgba(0,255,0,0.1);
-  backdrop-filter: blur(6px);
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(55px,1fr));
+  gap:8px;
+  width:min(95%,600px);
+  margin:20px auto;
+  padding:10px;
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+  box-shadow:0 0 20px rgba(0,255,0,0.1);
+  backdrop-filter:blur(6px);
 }
+
+/* Efecto de brillo */
+@keyframes glowPulse {
+  0%   { box-shadow:0 0 6px #0f0,0 0 12px #0f0; }
+  50%  { box-shadow:0 0 14px #0f0,0 0 28px #0f0; }
+  100% { box-shadow:0 0 6px #0f0,0 0 12px #0f0; }
+}
+
 .num {
-  background: rgba(255,255,255,0.1);
-  padding: 12px 0;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all .25s;
-  font-size: clamp(.9rem, 3vw, 1.1rem);
-  font-weight: bold;
+  background:rgba(255,255,255,0.1);
+  padding:12px 0;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:clamp(.9rem,3vw,1.1rem);
+  font-weight:bold;
+  color:#fff;
+  animation:glowPulse 2s infinite;
+  transition:transform .25s;
 }
 .num:hover {
-  background: rgba(0,255,0,0.3);
-  color: #000;
-  box-shadow: 0 0 12px rgba(0,255,0,0.7);
+  transform:scale(1.05);
+  background:rgba(0,255,0,0.25);
 }
 .selected {
-  background: rgba(0,255,0,0.6);
-  color: #000;
-  box-shadow: 0 0 18px rgba(0,255,0,0.8);
+  background:rgba(0,255,0,0.6);
+  color:#000;
+  box-shadow:0 0 18px #0f0,0 0 30px #0f0;
 }
 .bloqueado {
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.4);
-  text-decoration: line-through;
-  cursor: not-allowed;
+  background:rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);
+  text-decoration:line-through;
+  cursor:not-allowed;
+  animation:none;
 }
 
-/* ==== MODAL ==== */
 .modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 10px;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+  padding:10px;
 }
 .modal-content {
-  background: linear-gradient(135deg,#222,#111);
-  border: 3px solid #0f0;
-  border-radius: 16px;
-  padding: 25px;
-  width: 95%;
-  max-width: 360px;
-  text-align: center;
-  color: #fff;
-  animation: zoomIn .4s ease;
-  box-shadow: 0 0 30px rgba(0,255,0,0.6);
+  background:linear-gradient(135deg,#222,#111);
+  border:3px solid #0f0;
+  border-radius:16px;
+  padding:25px;
+  width:95%;
+  max-width:360px;
+  text-align:center;
+  color:#fff;
+  animation:zoomIn .4s ease;
+  box-shadow:0 0 30px rgba(0,255,0,0.6);
 }
 @keyframes zoomIn {
-  from {transform: scale(0.5); opacity: 0;}
-  to   {transform: scale(1);   opacity: 1;}
+  from{transform:scale(0.5);opacity:0;}
+  to{transform:scale(1);opacity:1;}
 }
 .modal-content h2 {
-  color: #0f0;
-  margin-bottom: 10px;
-  font-size: clamp(1.3rem,4vw,1.8rem);
+  color:#0f0;
+  margin-bottom:10px;
+  font-size:clamp(1.3rem,4vw,1.8rem);
 }
 .modal-content p {
-  font-size: clamp(.9rem,3vw,1.1rem);
-  line-height: 1.4;
-  margin-bottom: 20px;
+  font-size:clamp(.9rem,3vw,1.1rem);
+  line-height:1.4;
+  margin-bottom:20px;
 }
 .modal-content button {
-  padding: 14px 40px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
-  background-size: 600% 600%;
-  color: #000;
-  font-weight: bold;
-  font-size: clamp(1rem,3vw,1.2rem);
-  cursor: pointer;
-  box-shadow: 0 0 20px rgba(0,255,255,0.4);
-  animation: gradiente 6s ease infinite;
+  padding:14px 40px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
+  background-size:600% 600%;
+  color:#000;
+  font-weight:bold;
+  font-size:clamp(1rem,3vw,1.2rem);
+  cursor:pointer;
+  box-shadow:0 0 20px rgba(0,255,255,0.4);
+  animation:gradiente 6s ease infinite;
 }
 @keyframes gradiente {
   0%{background-position:0% 50%;}
@@ -162,25 +163,23 @@ h1 {
   100%{background-position:0% 50%;}
 }
 .modal-content button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(0,255,255,0.7);
+  transform:scale(1.05);
+  box-shadow:0 0 30px rgba(0,255,255,0.7);
 }
 
-/* ==== FOOTER ==== */
 footer {
-  margin: 40px auto 20px;
-  font-size: clamp(.8rem,2.5vw,.9rem);
-  color: #aaa;
-  width: min(95%, 600px);
+  margin:40px auto 20px;
+  font-size:clamp(.8rem,2.5vw,.9rem);
+  color:#aaa;
+  width:min(95%,600px);
 }
 footer a {color:#0f0;text-decoration:none;margin:0 5px;}
-footer a:hover {text-decoration: underline;}
+footer a:hover {text-decoration:underline;}
 
-/* ==== MEDIA QUERIES EXTRA ==== */
-@media (max-width: 480px) {
-  .grid {
-    grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
-    gap: 6px;
+@media (max-width:480px){
+  .grid{
+    grid-template-columns:repeat(auto-fit, minmax(45px,1fr));
+    gap:6px;
   }
 }
 </style>
@@ -237,11 +236,11 @@ footer a:hover {text-decoration: underline;}
 </footer>
 
 <script>
-const grid = document.getElementById('grid');
-const contador = document.getElementById('contador');
-const ticker = document.getElementById('ticker');
-const modalText = document.getElementById('modalText');
-let elegido=null, bloqueados=[], cajeroActual=null;
+const grid=document.getElementById('grid');
+const contador=document.getElementById('contador');
+const ticker=document.getElementById('ticker');
+const modalText=document.getElementById('modalText');
+let elegido=null,bloqueados=[],cajeroActual=null;
 
 function cargarBloqueados(){
   fetch('/api/bloqueados').then(r=>r.json()).then(d=>{
@@ -255,7 +254,7 @@ function cargarStats(){
     ticker.textContent=d.ultimos.length ? 'Últimos números: '+d.ultimos.join(' - ') : '';
   });
 }
-fetch('/api/cajero').then(r=>r.json()).then(d=>{ cajeroActual=d.cajero; });
+fetch('/api/cajero').then(r=>r.json()).then(d=>{cajeroActual=d.cajero;});
 
 function renderGrid(){
   grid.innerHTML="";
@@ -273,7 +272,6 @@ function renderGrid(){
         elegido=i;
         abrirModal('modalReserva',
           `Tu número elegido es <b>${elegido}</b> ✅<br><br>`+
-          `Tu cajero asignado es <b>Facu</b>.<br>`+
           `Presioná <b>Reservar número</b> para confirmar y abrir WhatsApp.`
         );
       };
@@ -305,7 +303,7 @@ function confirmarReserva(){
       cerrarModal('modalReserva');
       cargarBloqueados();
       cargarStats();
-      const msg=`Hola Facu! Mi número elegido para el sorteo es ${elegido}`;
+      const msg=`Hola! Mi número elegido para el sorteo es ${elegido}`;
       window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
     }else{
       modalText.innerHTML="Ese número ya fue ocupado, elegí otro 😅";
