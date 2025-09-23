@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gana en grande con Fortuna Play™</title>
 
-<!-- ✅ Metadatos Open Graph -->
+<!-- ✅ Metadatos Open Graph (solo para vista previa) -->
 <meta property="og:title" content="Gana en grande con Fortuna Play™">
 <meta property="og:description" content="Elegí tu número para participar de la promo y ganar premios increíbles. ¡Entrá y probá tu suerte ahora!">
 <meta property="og:image" content="https://iili.io/KcVxJ6v.md.jpg">
 <meta property="og:url" content="https://tudominio.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fortuna Play™">
-
-<!-- ✅ Favicon para navegadores -->
-<link rel="icon" type="image/jpeg" href="https://iili.io/KcVxJ6v.md.jpg">
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -37,7 +34,6 @@ header img{
   display:block;
   margin:20px auto 10px;
   border-radius:16px;
-  box-shadow:0 0 12px rgba(0,255,0,0.4);
 }
 h1{
   margin:15px 10px;
@@ -45,20 +41,257 @@ h1{
   text-shadow:0 0 8px rgba(0,255,0,0.6);
   font-size:clamp(1.6rem,5vw,2.6rem);
 }
-/* --- resto de estilos iguales --- */
+.stats{
+  margin:10px auto;
+  width:min(95%,600px);
+  font-size:clamp(1rem,2.5vw,1.2rem);
+}
+.ticker{
+  overflow:hidden;
+  white-space:nowrap;
+  animation:ticker 25s linear infinite;
+  color:#ffeb3b;
+  margin-top:8px;
+  font-weight:bold;
+  text-shadow:0 0 4px rgba(255,255,0,0.5);
+  font-size:clamp(.9rem,2.5vw,1.1rem);
+}
+#listaBloqueados{
+  margin-top:10px;
+  font-size:clamp(.8rem,2.5vw,1rem);
+  color:#0f0;
+}
+@keyframes ticker {
+  0%{transform:translateX(100%);}
+  100%{transform:translateX(-100%);}
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(55px,1fr));
+  gap:8px;
+  width:min(95%,600px);
+  margin:20px auto;
+  padding:10px;
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+}
+.num{
+  background:rgba(255,255,255,0.08);
+  padding:12px 0;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:clamp(.9rem,3vw,1.1rem);
+  font-weight:bold;
+  color:#fff;
+  transition:background .25s, transform .25s;
+}
+.num:hover{
+  transform:scale(1.05);
+  background:rgba(0,255,0,0.25);
+}
+.selected{
+  background:rgba(0,255,0,0.6);
+  color:#000;
+}
+.bloqueado{
+  text-decoration:line-through;
+  cursor:not-allowed;
+}
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  padding:16px;
+  overflow:auto;
+  z-index:1000;
+}
+.modal-content{
+  background:#222;
+  border:2px solid #0f0;
+  border-radius:16px;
+  width:calc(100% - 32px);
+  max-width:360px;
+  max-height:calc(100% - 32px);
+  padding:clamp(16px,5vw,25px);
+  margin:40px auto;
+  box-sizing:border-box;
+  text-align:center;
+  color:#fff;
+  overflow-y:auto;
+}
+.modal-content h2{
+  color:#0f0;
+  margin-bottom:10px;
+  font-size:clamp(1.3rem,4vw,1.8rem);
+}
+.modal-content p{
+  font-size:clamp(.9rem,3vw,1.1rem);
+  line-height:1.4;
+  margin-bottom:20px;
+}
+.modal-content button{
+  padding:14px 40px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
+  background-size:600% 600%;
+  color:#000;
+  font-weight:bold;
+  font-size:clamp(1rem,3vw,1.2rem);
+  cursor:pointer;
+}
+.modal-content button:hover{transform:scale(1.05);}
+footer{
+  margin:40px auto 20px;
+  font-size:clamp(.8rem,2.5vw,.9rem);
+  color:#aaa;
+  width:min(95%,600px);
+}
+footer a{color:#0f0;text-decoration:none;margin:0 5px;}
+footer a:hover{text-decoration:underline;}
+@media (max-width:480px){
+  .grid{grid-template-columns:repeat(auto-fit, minmax(45px,1fr));gap:6px;}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <!-- 🔥 Logo principal con la nueva imagen -->
-  <img src="https://iili.io/KcVxJ6v.md.jpg" alt="Fortuna Play Vista Previa">
+  <!-- Logo original -->
+  <img src="https://iili.io/KaQZyss.md.jpg" alt="Fortuna Play Logo">
 </header>
 
 <h1>🎉 Elegí tu número para participar de la promo 🎉</h1>
 
-<!-- 🔥 CONTENIDO DE LA PÁGINA IGUAL QUE ANTES -->
-<!-- ... todo el HTML, modales, footer y scripts idénticos a la versión anterior ... -->
+<div class="stats">
+  Participantes hasta ahora: <span id="contador">0</span> 🎯
+  <div class="ticker" id="ticker">🔥 POSIBLES GANADORES 🔥👉🏻</div>
+  <div id="listaBloqueados">Números reservados: ninguno</div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<!-- Modal Reserva -->
+<div class="modal" id="modalReserva">
+  <div class="modal-content">
+    <h2>Confirmá tu reserva</h2>
+    <p id="modalText"></p>
+    <button onclick="confirmarReserva()">Reservar número</button>
+    <br><br>
+    <button onclick="cerrarModal('modalReserva')">Cerrar</button>
+  </div>
+</div>
+
+<!-- Modal Bases -->
+<div class="modal" id="modalBases">
+  <div class="modal-content" style="text-align:left;">
+    <h2>Bases y Condiciones</h2>
+    <p>
+      • La participación es gratuita y voluntaria. El número es una posibilidad más de ganar; no es una rifa ni un sorteo.<br>
+      • Cada persona puede reservar solo un número.<br>
+      • El número ganador será publicado en la página y en los estados de WhatsApp (recordá agendarnos).<br>
+      • El premio se coordinará únicamente con el número de WhatsApp utilizado para la reserva.<br>
+      • La organización se reserva el derecho de validar los datos y de anular reservas fraudulentas.<br>
+      • Al participar aceptás estas condiciones.
+    </p>
+    <button onclick="cerrarModal('modalBases')">Cerrar</button>
+  </div>
+</div>
+
+<footer>
+  <p>
+    <a href="https://www.instagram.com/fortunaplay001?igsh=amo3OWdoazFlaGN2" target="_blank">¡Seguinos en Instagram!</a>
+    • <a href="#" onclick="abrirModal('modalBases');return false;">Bases y Condiciones</a>
+  </p>
+</footer>
+
+<script>
+const grid=document.getElementById('grid');
+const contador=document.getElementById('contador');
+const ticker=document.getElementById('ticker');
+const listaBloqueados=document.getElementById('listaBloqueados');
+const modalText=document.getElementById('modalText');
+let elegido=null,bloqueados=[],cajeroActual=null;
+
+function cargarDatos(){
+  fetch('/api/bloqueados').then(r=>r.json()).then(bloq=>{
+    bloqueados = bloq.bloqueados;
+    contador.textContent = bloqueados.length;
+    ticker.textContent = bloqueados.length
+      ? '🔥 POSIBLES GANADORES 🔥👉🏻 ' + bloqueados.join(' - ')
+      : '🔥 POSIBLES GANADORES 🔥👉🏻 (sin reservas)';
+    listaBloqueados.innerHTML = bloqueados.length
+      ? 'Números reservados: ' + bloqueados.join(', ')
+      : 'Números reservados: ninguno';
+    renderGrid();
+  });
+}
+
+fetch('/api/cajero').then(r=>r.json()).then(d=>{cajeroActual=d.cajero;});
+
+function renderGrid(){
+  grid.innerHTML="";
+  for(let i=1;i<=100;i++){
+    const div=document.createElement('div');
+    div.textContent=i;
+    if(bloqueados.includes(i)){
+      div.className='num bloqueado selected';
+    }else{
+      div.className='num';
+      div.onclick=()=>{
+        if(div.classList.contains('bloqueado'))return;
+        document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
+        div.classList.add('selected');
+        elegido=i;
+        abrirModal('modalReserva',
+          `Tu número elegido es <b>${elegido}</b> ✅<br><br>`+
+          `Presioná <b>Reservar número</b> para confirmar y abrir WhatsApp.`
+        );
+      };
+    }
+    grid.appendChild(div);
+  }
+}
+
+function abrirModal(id,texto=""){
+  const modal=document.getElementById(id);
+  if(texto) modalText.innerHTML=texto;
+  modal.style.display='block';
+}
+function cerrarModal(id){
+  document.getElementById(id).style.display='none';
+}
+
+function confirmarReserva(){
+  if(!elegido || !cajeroActual){ cerrarModal('modalReserva'); return; }
+  fetch('/api/registrar',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({numero:elegido,telefono:'sin-dato'})
+  }).then(r=>r.json()).then(res=>{
+    if(res.ok){
+      confetti({particleCount:100,spread:70,origin:{y:0.6}});
+      const audio=new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg');
+      audio.play();
+      cerrarModal('modalReserva');
+      cargarDatos();
+      const msg=`Mi número elegido para ganar el Premio Fortuna Play es el número ${elegido}`;
+      setTimeout(()=>{
+        window.open(`https://wa.me/${cajeroActual}?text=${encodeURIComponent(msg)}`,'_blank');
+      },1500);
+    }else{
+      modalText.innerHTML="Ese número ya fue ocupado, elegí otro 😅";
+    }
+  });
+}
+
+setInterval(cargarDatos,10000);
+cargarDatos();
+</script>
 
 </body>
 </html>
