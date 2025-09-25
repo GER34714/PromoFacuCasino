@@ -29,18 +29,58 @@ body{
     url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
   overflow-x:hidden;
 }
-header img{
-  width:min(90%,600px);
-  display:block;
-  margin:20px auto 10px;
-  border-radius:16px;
+
+/* === Logo con pulso === */
+.logo-promo{
+  position:relative;
+  display:inline-block;
+  margin:25px auto 10px;
+  padding:20px;
 }
+.logo-promo::before{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  width:340px;height:340px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:conic-gradient(red,orange,yellow,green,cyan,blue,purple,red);
+  filter:blur(30px);
+  opacity:.7;
+  animation:pulse 3s infinite;
+  z-index:0;
+}
+@keyframes pulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1);}
+  50%{transform:translate(-50%,-50%) scale(1.2);}
+}
+.logo-promo img{
+  position:relative;
+  z-index:1;
+  width:260px;
+  max-width:90vw;
+  border-radius:20px;
+}
+
 h1{
   margin:15px 10px;
   color:#0f0;
   text-shadow:0 0 8px rgba(0,255,0,0.6);
   font-size:clamp(1.6rem,5vw,2.6rem);
 }
+
+.premios{
+  margin:15px auto;
+  width:min(95%,600px);
+  padding:15px;
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+  font-weight:bold;
+  font-size:clamp(1.2rem,4vw,1.6rem);
+  line-height:2.4rem;
+  text-shadow:0 0 12px rgba(255,255,255,0.6);
+}
+
 .stats{
   margin:10px auto;
   width:min(95%,600px);
@@ -99,10 +139,8 @@ h1{
 }
 .modal{
   position:fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
+  top:0;left:0;
+  width:100vw;height:100vh;
   background:rgba(0,0,0,0.7);
   display:none;
   padding:16px;
@@ -161,11 +199,20 @@ footer a:hover{text-decoration:underline;}
 <body>
 
 <header>
-  <!-- Logo original -->
-  <img src="https://iili.io/KaQZyss.md.jpg" alt="Fortuna Play Logo">
+  <!-- Nuevo logo con pulso -->
+  <div class="logo-promo">
+    <img src="https://iili.io/Klm8Llf.md.webp" alt="Logo Fortuna Play Promo">
+  </div>
 </header>
 
 <h1>🎉 Elegí tu número para participar de la promo 🎉</h1>
+
+<!-- 🔥 Bloque de premios bien visible -->
+<div class="premios">
+  🏆 Primer Premio: $100.000<br>
+  💎 Segundo Premio: $70.000<br>
+  🎁 Tercer Premio: $50.000
+</div>
 
 <div class="stats">
   Participantes hasta ahora: <span id="contador">0</span> 🎯
