@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gana en grande con Fortuna Play™</title>
 
-<!-- ✅ Metadatos Open Graph (solo para vista previa) -->
+<!-- ✅ Metadatos Open Graph -->
 <meta property="og:title" content="Gana en grande con Fortuna Play™">
 <meta property="og:description" content="Elegí tu número para participar de la promo y ganar premios increíbles. ¡Entrá y probá tu suerte ahora!">
 <meta property="og:image" content="https://iili.io/KcVxJ6v.md.jpg">
@@ -18,73 +18,72 @@
 <style>
 *,
 *::before,
-*::after { box-sizing: border-box; }
-html, body {margin:0;padding:0;}
+*::after{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family:'Segoe UI',Arial,sans-serif;
   color:#fff;
   text-align:center;
-  background:
-    linear-gradient(135deg, rgba(17,17,17,0.85), rgba(0,0,0,0.85)),
-    url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
-  overflow-x:hidden;
+  background:linear-gradient(135deg,rgba(17,17,17,0.85),rgba(0,0,0,0.85)),
+             url('https://iili.io/KaQb5WF.md.webp') center/cover no-repeat fixed;
+  min-height:100vh;
+  padding:clamp(10px,4vw,25px);
 }
 
-/* === Logo con pulso === */
+/* === Logo con pulso neon === */
 .logo-promo{
   position:relative;
   display:inline-block;
-  margin:25px auto 10px;
-  padding:20px;
+  margin:clamp(15px,4vw,30px) auto;
+  padding:clamp(10px,3vw,20px);
 }
 .logo-promo::before{
   content:'';
   position:absolute;
   top:50%;left:50%;
-  width:340px;height:340px;
+  width:clamp(220px,50vw,360px);
+  height:clamp(220px,50vw,360px);
   transform:translate(-50%,-50%);
   border-radius:50%;
   background:conic-gradient(red,orange,yellow,green,cyan,blue,purple,red);
-  filter:blur(30px);
+  filter:blur(25px);
   opacity:.7;
   animation:pulse 3s infinite;
   z-index:0;
 }
 @keyframes pulse{
   0%,100%{transform:translate(-50%,-50%) scale(1);}
-  50%{transform:translate(-50%,-50%) scale(1.2);}
+  50%{transform:translate(-50%,-50%) scale(1.15);}
 }
 .logo-promo img{
   position:relative;
   z-index:1;
-  width:260px;
+  width:clamp(180px,45vw,280px);
   max-width:90vw;
   border-radius:20px;
 }
 
+/* === Textos === */
 h1{
-  margin:15px 10px;
+  margin:clamp(15px,3vw,25px) auto;
   color:#0f0;
   text-shadow:0 0 8px rgba(0,255,0,0.6);
-  font-size:clamp(1.6rem,5vw,2.6rem);
+  font-size:clamp(1.4rem,5vw,2.6rem);
 }
-
 .premios{
-  margin:15px auto;
-  width:min(95%,600px);
-  padding:15px;
+  margin:clamp(15px,4vw,25px) auto;
+  width:min(95%,650px);
+  padding:clamp(10px,3vw,20px);
   background:rgba(255,255,255,0.05);
   border-radius:16px;
   font-weight:bold;
-  font-size:clamp(1.2rem,4vw,1.6rem);
-  line-height:2.4rem;
+  font-size:clamp(1.1rem,4vw,1.6rem);
+  line-height:clamp(1.8rem,5vw,2.4rem);
   text-shadow:0 0 12px rgba(255,255,255,0.6);
 }
-
 .stats{
-  margin:10px auto;
-  width:min(95%,600px);
-  font-size:clamp(1rem,2.5vw,1.2rem);
+  margin:clamp(10px,3vw,20px) auto;
+  width:min(95%,650px);
+  font-size:clamp(.9rem,3vw,1.2rem);
 }
 .ticker{
   overflow:hidden;
@@ -94,30 +93,32 @@ h1{
   margin-top:8px;
   font-weight:bold;
   text-shadow:0 0 4px rgba(255,255,0,0.5);
-  font-size:clamp(.9rem,2.5vw,1.1rem);
+  font-size:clamp(.8rem,2.5vw,1rem);
 }
 #listaBloqueados{
   margin-top:10px;
   font-size:clamp(.8rem,2.5vw,1rem);
   color:#0f0;
 }
-@keyframes ticker {
+@keyframes ticker{
   0%{transform:translateX(100%);}
   100%{transform:translateX(-100%);}
 }
+
+/* === Grilla de números === */
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(55px,1fr));
-  gap:8px;
-  width:min(95%,600px);
-  margin:20px auto;
-  padding:10px;
+  grid-template-columns:repeat(auto-fit, minmax(clamp(40px,12vw,65px),1fr));
+  gap:clamp(6px,2vw,12px);
+  width:min(95%,650px);
+  margin:clamp(15px,4vw,30px) auto;
+  padding:clamp(8px,3vw,16px);
   background:rgba(255,255,255,0.05);
   border-radius:16px;
 }
 .num{
   background:rgba(255,255,255,0.08);
-  padding:12px 0;
+  padding:clamp(8px,2vw,14px) 0;
   border-radius:10px;
   cursor:pointer;
   font-size:clamp(.9rem,3vw,1.1rem);
@@ -137,6 +138,8 @@ h1{
   text-decoration:line-through;
   cursor:not-allowed;
 }
+
+/* === Modales === */
 .modal{
   position:fixed;
   top:0;left:0;
@@ -151,55 +154,50 @@ h1{
   background:#222;
   border:2px solid #0f0;
   border-radius:16px;
-  width:calc(100% - 32px);
+  width:90%;
   max-width:360px;
-  max-height:calc(100% - 32px);
-  padding:clamp(16px,5vw,25px);
   margin:40px auto;
-  box-sizing:border-box;
+  padding:clamp(16px,5vw,25px);
   text-align:center;
   color:#fff;
-  overflow-y:auto;
 }
 .modal-content h2{
   color:#0f0;
   margin-bottom:10px;
-  font-size:clamp(1.3rem,4vw,1.8rem);
+  font-size:clamp(1.2rem,4vw,1.6rem);
 }
 .modal-content p{
-  font-size:clamp(.9rem,3vw,1.1rem);
+  font-size:clamp(.85rem,3vw,1rem);
   line-height:1.4;
   margin-bottom:20px;
 }
 .modal-content button{
-  padding:14px 40px;
+  padding:clamp(10px,3vw,14px) clamp(25px,8vw,40px);
   border:none;
   border-radius:10px;
   background:linear-gradient(45deg,#00ff88,#00d0ff,#ff00ff);
   background-size:600% 600%;
   color:#000;
   font-weight:bold;
-  font-size:clamp(1rem,3vw,1.2rem);
+  font-size:clamp(.9rem,3vw,1.1rem);
   cursor:pointer;
 }
 .modal-content button:hover{transform:scale(1.05);}
+
+/* === Footer === */
 footer{
-  margin:40px auto 20px;
-  font-size:clamp(.8rem,2.5vw,.9rem);
+  margin:clamp(20px,4vw,40px) auto 10px;
+  font-size:clamp(.75rem,2.5vw,.9rem);
   color:#aaa;
-  width:min(95%,600px);
+  width:min(95%,650px);
 }
 footer a{color:#0f0;text-decoration:none;margin:0 5px;}
 footer a:hover{text-decoration:underline;}
-@media (max-width:480px){
-  .grid{grid-template-columns:repeat(auto-fit, minmax(45px,1fr));gap:6px;}
-}
 </style>
 </head>
 <body>
 
 <header>
-  <!-- Nuevo logo con pulso -->
   <div class="logo-promo">
     <img src="https://iili.io/Klm8Llf.md.webp" alt="Logo Fortuna Play Promo">
   </div>
@@ -207,7 +205,6 @@ footer a:hover{text-decoration:underline;}
 
 <h1>🎉 Elegí tu número para participar de la promo 🎉</h1>
 
-<!-- 🔥 Bloque de premios bien visible -->
 <div class="premios">
   🏆 Primer Premio: $100.000<br>
   💎 Segundo Premio: $70.000<br>
@@ -238,11 +235,10 @@ footer a:hover{text-decoration:underline;}
   <div class="modal-content" style="text-align:left;">
     <h2>Bases y Condiciones</h2>
     <p>
-      • La participación es gratuita y voluntaria. El número es una posibilidad más de ganar; no es una rifa ni un sorteo.<br>
+      • La participación es gratuita y voluntaria.<br>
       • Cada persona puede reservar solo un número.<br>
-      • El número ganador será publicado en la página y en los estados de WhatsApp (recordá agendarnos).<br>
-      • El premio se coordinará únicamente con el número de WhatsApp utilizado para la reserva.<br>
-      • La organización se reserva el derecho de validar los datos y de anular reservas fraudulentas.<br>
+      • El ganador se publicará en la página y en WhatsApp.<br>
+      • El premio se coordinará únicamente con el WhatsApp usado para la reserva.<br>
       • Al participar aceptás estas condiciones.
     </p>
     <button onclick="cerrarModal('modalBases')">Cerrar</button>
@@ -263,7 +259,42 @@ const ticker=document.getElementById('ticker');
 const listaBloqueados=document.getElementById('listaBloqueados');
 const modalText=document.getElementById('modalText');
 let elegido=null,bloqueados=[],cajeroActual=null;
+const celdas=[];
 
+/* 👉 Crear grilla solo UNA vez */
+function initGrid(){
+  for(let i=1;i<=100;i++){
+    const div=document.createElement('div');
+    div.textContent=i;
+    div.className='num';
+    div.onclick=()=>{
+      if(div.classList.contains('bloqueado'))return;
+      document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
+      div.classList.add('selected');
+      elegido=i;
+      abrirModal('modalReserva',
+        `Tu número elegido es <b>${elegido}</b> ✅<br><br>`+
+        `Presioná <b>Reservar número</b> para confirmar y abrir WhatsApp.`
+      );
+    };
+    grid.appendChild(div);
+    celdas[i]=div;
+  }
+}
+
+/* 👉 Actualizar solo las clases */
+function actualizarClases(){
+  celdas.forEach((celda,i)=>{
+    if(!celda) return;
+    if(bloqueados.includes(i)){
+      celda.classList.add('bloqueado','selected');
+    }else{
+      celda.classList.remove('bloqueado','selected');
+    }
+  });
+}
+
+/* 👉 Cargar datos */
 function cargarDatos(){
   fetch('/api/bloqueados').then(r=>r.json()).then(bloq=>{
     bloqueados = bloq.bloqueados;
@@ -274,35 +305,10 @@ function cargarDatos(){
     listaBloqueados.innerHTML = bloqueados.length
       ? 'Números reservados: ' + bloqueados.join(', ')
       : 'Números reservados: ninguno';
-    renderGrid();
+    actualizarClases();
   });
 }
-
 fetch('/api/cajero').then(r=>r.json()).then(d=>{cajeroActual=d.cajero;});
-
-function renderGrid(){
-  grid.innerHTML="";
-  for(let i=1;i<=100;i++){
-    const div=document.createElement('div');
-    div.textContent=i;
-    if(bloqueados.includes(i)){
-      div.className='num bloqueado selected';
-    }else{
-      div.className='num';
-      div.onclick=()=>{
-        if(div.classList.contains('bloqueado'))return;
-        document.querySelectorAll('.num').forEach(n=>n.classList.remove('selected'));
-        div.classList.add('selected');
-        elegido=i;
-        abrirModal('modalReserva',
-          `Tu número elegido es <b>${elegido}</b> ✅<br><br>`+
-          `Presioná <b>Reservar número</b> para confirmar y abrir WhatsApp.`
-        );
-      };
-    }
-    grid.appendChild(div);
-  }
-}
 
 function abrirModal(id,texto=""){
   const modal=document.getElementById(id);
@@ -336,7 +342,9 @@ function confirmarReserva(){
   });
 }
 
-setInterval(cargarDatos,10000);
+/* Inicializar */
+initGrid();
+setInterval(cargarDatos,15000); // podés subirlo a 20–30s si querés menos tráfico
 cargarDatos();
 </script>
 
